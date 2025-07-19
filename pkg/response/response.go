@@ -49,5 +49,5 @@ func AsJSON(ctx *gin.Context, data interface{}, err interface{}) {
 		}
 		return
 	}
-	Success(ctx, http.StatusOK, "Success", data)
+	Success(ctx, http.StatusOK, "success", data)
 }

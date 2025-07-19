@@ -2,6 +2,7 @@ package userhandler
 
 import (
 	"net/http"
+	"reapp/internal/handler"
 	"reapp/internal/helpers/ctxhelper"
 	"reapp/internal/modules/user/usermodel"
 	"reapp/internal/modules/user/userservice"
@@ -91,10 +92,9 @@ func (h *UserHandler) Delete(ctx *gin.Context) {
 	response.AsJSON(ctx, nil, err)
 }
 
-func (h *UserHandler) GetAll(ctx *gin.Context) {
-	db := ctxhelper.GetDB(ctx)
-	data, err := h.service.GetAll(db)
-	response.AsJSON(ctx, data, err)
+func (h *UserHandler) List(ctx *gin.Context) {
+	var query usermodel.UserListQuery
+	handler.PaginateList(ctx, &query, h.service)
 }
 
 func (h *UserHandler) ChangePassword(ctx *gin.Context) {

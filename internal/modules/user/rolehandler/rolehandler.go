@@ -2,13 +2,12 @@ package rolehandler
 
 import (
 	"net/http"
+	"reapp/internal/handler"
 	"reapp/internal/helpers/ctxhelper"
 	"reapp/internal/modules/user/rolemodel"
 	"reapp/internal/modules/user/roleservice"
 	"reapp/pkg/binding"
-	"reapp/pkg/filterscopes"
 	"reapp/pkg/mapper"
-	"reapp/pkg/paginator"
 	"reapp/pkg/requestutils"
 	"reapp/pkg/response"
 	"reapp/pkg/validators"
@@ -115,27 +114,6 @@ func (h *RoleHandler) GetAll(ctx *gin.Context) {
 }
 
 func (h *RoleHandler) List(ctx *gin.Context) {
-	db := ctxhelper.GetDB(ctx)
 	var query rolemodel.RoleListQuery
-	var pagination paginator.Pagination
-
-	if err := ctx.ShouldBindQuery(&query); err != nil {
-		response.Error(ctx, http.StatusBadRequest, err.Error(), nil)
-		return
-	}
-
-	if err := ctx.ShouldBindQuery(&pagination); err != nil {
-		response.Error(ctx, http.StatusBadRequest, err.Error(), nil)
-		return
-	}
-
-	queryValues := ctx.Request.URL.Query()
-	filters := filterscopes.ParseQueryByUrlValues(&query, queryValues)
-
-	if err := h.service.List(db, &pagination, filters); err != nil {
-		response.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
-		return
-	}
-
-	response.AsJSON(ctx, pagination, nil)
+	handler.PaginateList(ctx, &query, h.service)
 }

@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"reapp/internal/modules/user/usermodel"
 	"reapp/internal/modules/user/userrepository"
+	"reapp/pkg/filterscopes"
 	"reapp/pkg/hashcrypto"
+	"reapp/pkg/paginator"
 
 	"gorm.io/gorm"
 )
@@ -14,7 +16,7 @@ type IUserService interface {
 	Update(db *gorm.DB, user *usermodel.User) error
 	GetByID(db *gorm.DB, id uint32) (*usermodel.User, error)
 	Delete(db *gorm.DB, id uint32) error
-	GetAll(db *gorm.DB) ([]usermodel.User, error)
+	List(db *gorm.DB, pg *paginator.Pagination, filters []filterscopes.QueryFilter) error
 	ChangePassword(db *gorm.DB, data usermodel.ChangePassword) error
 }
 
@@ -52,8 +54,8 @@ func (s *UserService) Delete(db *gorm.DB, id uint32) error {
 	return s.repository.Delete(db, id)
 }
 
-func (s *UserService) GetAll(db *gorm.DB) ([]usermodel.User, error) {
-	return s.repository.GetAll(db)
+func (s *UserService) List(db *gorm.DB, pg *paginator.Pagination, filters []filterscopes.QueryFilter) error {
+	return s.repository.List(db, pg, filters)
 }
 
 func (s *UserService) ChangePassword(db *gorm.DB, data usermodel.ChangePassword) error {

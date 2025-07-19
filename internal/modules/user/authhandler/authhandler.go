@@ -43,5 +43,5 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 		Username: user.Username,
 		Token:    token,
 	}
-	response.Success(ctx, http.StatusOK, "Login Success", data)
+	response.Success(ctx, http.StatusOK, "login success", data)
 }

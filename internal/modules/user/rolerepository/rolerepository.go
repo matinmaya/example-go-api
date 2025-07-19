@@ -50,9 +50,9 @@ func (r *RoleRepository) GetAll(db *gorm.DB) ([]rolemodel.Role, error) {
 
 func (r *RoleRepository) List(db *gorm.DB, pg *paginator.Pagination, filters []filterscopes.QueryFilter) error {
 	var roles []rolemodel.Role
-	paginateScope := paginator.Paginate(db, &rolemodel.Role{}, pg, filters)
+	scope := paginator.Paginate(db, &rolemodel.Role{}, pg, filters)
 
-	err := db.Scopes(paginateScope).Find(&roles).Error
+	err := db.Scopes(scope).Find(&roles).Error
 	if err != nil {
 		return err
 	}

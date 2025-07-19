@@ -21,7 +21,7 @@ func (UserRoute) RegisterRoute(rg *gin.RouterGroup) {
 	r := rg.Group("/users").Use(auth)
 	h := userhandler.NewUserHandler(userservice.NewUserService(userrepository.NewUserRepository()))
 
-	r.GET("", authmiddleware.Can("users.read"), h.GetAll)
+	r.GET("", authmiddleware.Can("users.read"), h.List)
 	r.POST("", authmiddleware.Can("users.create"), h.Create)
 	r.PUT("/:id", authmiddleware.Can("users.update"), h.Update)
 	r.DELETE("/:id", authmiddleware.Can("users.delete"), h.Delete)

@@ -2,6 +2,8 @@ package userrepository
 
 import (
 	"reapp/internal/modules/user/usermodel"
+	"reapp/pkg/filterscopes"
+	"reapp/pkg/paginator"
 
 	"gorm.io/gorm"
 )
@@ -31,11 +33,17 @@ func (*UserRepository) GetByID(db *gorm.DB, id uint32) (*usermodel.User, error) 
 	return &user, err
 }
 
-func (*UserRepository) GetAll(db *gorm.DB) ([]usermodel.User, error) {
+func (*UserRepository) List(db *gorm.DB, pg *paginator.Pagination, filters []filterscopes.QueryFilter) error {
 	var users []usermodel.User
-	err := db.Order("created_at DESC").Find(&users).Error
+	scope := paginator.Paginate(db, &usermodel.User{}, pg, filters)
 
-	return users, err
+	err := db.Scopes(scope).Find(&users).Error
+	if err != nil {
+		return err
+	}
+
+	pg.SetRows(users)
+	return nil
 }
 
 func (*UserRepository) GetByUsername(db *gorm.DB, username string) (*usermodel.User, error) {
