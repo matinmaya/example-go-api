@@ -1,0 +1,201 @@
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/provider/provider.go:34
+[0.604ms] [rows:-] SELECT DATABASE()
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/provider/provider.go:34
+[4.768ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'example_db%' ORDER BY SCHEMA_NAME='example_db' DESC,SCHEMA_NAME limit 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/provider/provider.go:34
+[11.200ms] [rows:-] SELECT count(*) FROM information_schema.tables WHERE table_schema = 'example_db' AND table_name = 'sys_logs' AND table_type = 'BASE TABLE'
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/provider/provider.go:34
+[0.250ms] [rows:-] SELECT DATABASE()
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/provider/provider.go:34
+[1.324ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'example_db%' ORDER BY SCHEMA_NAME='example_db' DESC,SCHEMA_NAME limit 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/provider/provider.go:34
+[12.888ms] [rows:-] SELECT * FROM `sys_logs` LIMIT 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/provider/provider.go:34
+[4.160ms] [rows:-] SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'example_db' AND table_name = 'sys_logs' ORDER BY ORDINAL_POSITION
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.214ms] [rows:-] SELECT DATABASE()
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[1.628ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'example_db%' ORDER BY SCHEMA_NAME='example_db' DESC,SCHEMA_NAME limit 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[2.060ms] [rows:-] SELECT count(*) FROM information_schema.tables WHERE table_schema = 'example_db' AND table_name = 'sys_permissions' AND table_type = 'BASE TABLE'
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.211ms] [rows:-] SELECT DATABASE()
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.633ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'example_db%' ORDER BY SCHEMA_NAME='example_db' DESC,SCHEMA_NAME limit 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[5.312ms] [rows:-] SELECT * FROM `sys_permissions` LIMIT 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[1.152ms] [rows:-] SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'example_db' AND table_name = 'sys_permissions' ORDER BY ORDINAL_POSITION
+2025/07/17 14:31:02 
+[0.120ms] [rows:-] SELECT DATABASE()
+2025/07/17 14:31:02 
+[0.530ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'example_db%' ORDER BY SCHEMA_NAME='example_db' DESC,SCHEMA_NAME limit 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[2.508ms] [rows:3] 
+SELECT
+	TABLE_NAME,
+	COLUMN_NAME,
+	INDEX_NAME,
+	NON_UNIQUE 
+FROM
+	information_schema.STATISTICS 
+WHERE
+	TABLE_SCHEMA = 'example_db' 
+	AND TABLE_NAME = 'sys_permissions' 
+ORDER BY
+	INDEX_NAME,
+	SEQ_IN_INDEX
+2025/07/17 14:31:02 
+[0.124ms] [rows:-] SELECT DATABASE()
+2025/07/17 14:31:02 
+[0.552ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'example_db%' ORDER BY SCHEMA_NAME='example_db' DESC,SCHEMA_NAME limit 1
+2025/07/17 14:31:02 
+[2.260ms] [rows:-] SELECT count(*) FROM INFORMATION_SCHEMA.table_constraints WHERE constraint_schema = 'example_db' AND table_name = 'sys_permissions' AND constraint_name = 'uni_sys_permissions_name'
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.120ms] [rows:-] SELECT DATABASE()
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.541ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'example_db%' ORDER BY SCHEMA_NAME='example_db' DESC,SCHEMA_NAME limit 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.757ms] [rows:-] SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'example_db' AND table_name = 'sys_permissions' AND index_name = 'idx_sys_permissions_deleted_at'
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.108ms] [rows:-] SELECT DATABASE()
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.391ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'example_db%' ORDER BY SCHEMA_NAME='example_db' DESC,SCHEMA_NAME limit 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.828ms] [rows:-] SELECT count(*) FROM information_schema.tables WHERE table_schema = 'example_db' AND table_name = 'sys_roles' AND table_type = 'BASE TABLE'
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.102ms] [rows:-] SELECT DATABASE()
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.685ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'example_db%' ORDER BY SCHEMA_NAME='example_db' DESC,SCHEMA_NAME limit 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[3.660ms] [rows:-] SELECT * FROM `sys_roles` LIMIT 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[1.054ms] [rows:-] SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'example_db' AND table_name = 'sys_roles' ORDER BY ORDINAL_POSITION
+2025/07/17 14:31:02 
+[0.102ms] [rows:-] SELECT DATABASE()
+2025/07/17 14:31:02 
+[0.361ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'example_db%' ORDER BY SCHEMA_NAME='example_db' DESC,SCHEMA_NAME limit 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.738ms] [rows:3] 
+SELECT
+	TABLE_NAME,
+	COLUMN_NAME,
+	INDEX_NAME,
+	NON_UNIQUE 
+FROM
+	information_schema.STATISTICS 
+WHERE
+	TABLE_SCHEMA = 'example_db' 
+	AND TABLE_NAME = 'sys_roles' 
+ORDER BY
+	INDEX_NAME,
+	SEQ_IN_INDEX
+2025/07/17 14:31:02 
+[0.090ms] [rows:-] SELECT DATABASE()
+2025/07/17 14:31:02 
+[0.366ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'example_db%' ORDER BY SCHEMA_NAME='example_db' DESC,SCHEMA_NAME limit 1
+2025/07/17 14:31:02 
+[0.561ms] [rows:-] SELECT count(*) FROM INFORMATION_SCHEMA.table_constraints WHERE constraint_schema = 'example_db' AND table_name = 'sys_roles' AND constraint_name = 'uni_sys_roles_name'
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.107ms] [rows:-] SELECT DATABASE()
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.363ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'example_db%' ORDER BY SCHEMA_NAME='example_db' DESC,SCHEMA_NAME limit 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.634ms] [rows:-] SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'example_db' AND table_name = 'sys_roles' AND index_name = 'idx_sys_roles_deleted_at'
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.085ms] [rows:-] SELECT DATABASE()
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.663ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'example_db%' ORDER BY SCHEMA_NAME='example_db' DESC,SCHEMA_NAME limit 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[3.895ms] [rows:-] SELECT count(*) FROM information_schema.tables WHERE table_schema = 'example_db' AND table_name = 'sys_role_permission' AND table_type = 'BASE TABLE'
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.115ms] [rows:-] SELECT DATABASE()
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.339ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'example_db%' ORDER BY SCHEMA_NAME='example_db' DESC,SCHEMA_NAME limit 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[1.289ms] [rows:-] SELECT * FROM `sys_role_permission` LIMIT 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.723ms] [rows:-] SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'example_db' AND table_name = 'sys_role_permission' ORDER BY ORDINAL_POSITION
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.106ms] [rows:-] SELECT DATABASE()
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.342ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'example_db%' ORDER BY SCHEMA_NAME='example_db' DESC,SCHEMA_NAME limit 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.739ms] [rows:-] SELECT count(*) FROM INFORMATION_SCHEMA.table_constraints WHERE constraint_schema = 'example_db' AND table_name = 'sys_role_permission' AND constraint_name = 'fk_sys_role_permission_role'
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.059ms] [rows:-] SELECT DATABASE()
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.775ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'example_db%' ORDER BY SCHEMA_NAME='example_db' DESC,SCHEMA_NAME limit 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[1.054ms] [rows:-] SELECT count(*) FROM INFORMATION_SCHEMA.table_constraints WHERE constraint_schema = 'example_db' AND table_name = 'sys_role_permission' AND constraint_name = 'fk_sys_role_permission_permission'
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.122ms] [rows:-] SELECT DATABASE()
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.386ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'example_db%' ORDER BY SCHEMA_NAME='example_db' DESC,SCHEMA_NAME limit 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.749ms] [rows:-] SELECT count(*) FROM information_schema.tables WHERE table_schema = 'example_db' AND table_name = 'sys_users' AND table_type = 'BASE TABLE'
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.071ms] [rows:-] SELECT DATABASE()
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.545ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'example_db%' ORDER BY SCHEMA_NAME='example_db' DESC,SCHEMA_NAME limit 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[1.945ms] [rows:-] SELECT * FROM `sys_users` LIMIT 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[1.127ms] [rows:-] SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'example_db' AND table_name = 'sys_users' ORDER BY ORDINAL_POSITION
+2025/07/17 14:31:02 
+[0.072ms] [rows:-] SELECT DATABASE()
+2025/07/17 14:31:02 
+[0.209ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'example_db%' ORDER BY SCHEMA_NAME='example_db' DESC,SCHEMA_NAME limit 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.623ms] [rows:4] 
+SELECT
+	TABLE_NAME,
+	COLUMN_NAME,
+	INDEX_NAME,
+	NON_UNIQUE 
+FROM
+	information_schema.STATISTICS 
+WHERE
+	TABLE_SCHEMA = 'example_db' 
+	AND TABLE_NAME = 'sys_users' 
+ORDER BY
+	INDEX_NAME,
+	SEQ_IN_INDEX
+2025/07/17 14:31:02 
+[0.053ms] [rows:-] SELECT DATABASE()
+2025/07/17 14:31:02 
+[0.187ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'example_db%' ORDER BY SCHEMA_NAME='example_db' DESC,SCHEMA_NAME limit 1
+2025/07/17 14:31:02 
+[0.286ms] [rows:-] SELECT count(*) FROM INFORMATION_SCHEMA.table_constraints WHERE constraint_schema = 'example_db' AND table_name = 'sys_users' AND constraint_name = 'uni_sys_users_username'
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.052ms] [rows:-] SELECT DATABASE()
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.175ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'example_db%' ORDER BY SCHEMA_NAME='example_db' DESC,SCHEMA_NAME limit 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.291ms] [rows:-] SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'example_db' AND table_name = 'sys_users' AND index_name = 'idx_sys_users_deleted_at'
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.054ms] [rows:-] SELECT DATABASE()
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.188ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'example_db%' ORDER BY SCHEMA_NAME='example_db' DESC,SCHEMA_NAME limit 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.322ms] [rows:-] SELECT count(*) FROM information_schema.tables WHERE table_schema = 'example_db' AND table_name = 'sys_user_role' AND table_type = 'BASE TABLE'
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.052ms] [rows:-] SELECT DATABASE()
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.181ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'example_db%' ORDER BY SCHEMA_NAME='example_db' DESC,SCHEMA_NAME limit 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[1.347ms] [rows:-] SELECT * FROM `sys_user_role` LIMIT 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.715ms] [rows:-] SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'example_db' AND table_name = 'sys_user_role' ORDER BY ORDINAL_POSITION
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.083ms] [rows:-] SELECT DATABASE()
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.247ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'example_db%' ORDER BY SCHEMA_NAME='example_db' DESC,SCHEMA_NAME limit 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.599ms] [rows:-] SELECT count(*) FROM INFORMATION_SCHEMA.table_constraints WHERE constraint_schema = 'example_db' AND table_name = 'sys_user_role' AND constraint_name = 'fk_sys_user_role_user'
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.062ms] [rows:-] SELECT DATABASE()
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.242ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'example_db%' ORDER BY SCHEMA_NAME='example_db' DESC,SCHEMA_NAME limit 1
+2025/07/17 14:31:02 /Users/admin/Documents/Tests/example-go-api/internal/modules/user/usermigration/usermigration.go:12
+[0.302ms] [rows:-] SELECT count(*) FROM INFORMATION_SCHEMA.table_constraints WHERE constraint_schema = 'example_db' AND table_name = 'sys_user_role' AND constraint_name = 'fk_sys_user_role_role'
