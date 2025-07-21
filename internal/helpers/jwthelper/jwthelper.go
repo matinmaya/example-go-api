@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/google/uuid"
 )
 
 var JWTSecret = []byte("")
@@ -24,23 +25,42 @@ func GetSecret() []byte {
 	return JWTSecret
 }
 
-func GenerateJWT(user usermodel.User) (string, error) {
-	expirationTime := time.Now().Add(24 * time.Hour)
+func GenerateTokenWithExpiry(user usermodel.User, duration time.Duration) (string, jwt.StandardClaims, error) {
+	expirationTime := time.Now().Add(duration)
 	var roleIDs []uint16
 	for _, r := range user.Roles {
 		roleIDs = append(roleIDs, uint16(r.ID))
 	}
 
+	jti := uuid.New().String()
+	standardClaims := jwt.StandardClaims{
+		ExpiresAt: expirationTime.Unix(),
+		IssuedAt:  time.Now().Unix(),
+		Id:        jti,
+	}
+
 	claims := &Claims{
-		UserID:   user.ID,
-		RoleIDs:  roleIDs,
-		Username: user.Username,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expirationTime.Unix(),
-			IssuedAt:  time.Now().Unix(),
-		},
+		UserID:         user.ID,
+		RoleIDs:        roleIDs,
+		Username:       user.Username,
+		StandardClaims: standardClaims,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(JWTSecret)
+	generatedToken, err := token.SignedString(JWTSecret)
+	if err != nil {
+		return "", jwt.StandardClaims{}, err
+	}
+	return generatedToken, standardClaims, nil
+}
+
+func ParseToken(tokenStr string) (*Claims, error) {
+	token, err := jwt.ParseWithClaims(tokenStr, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return JWTSecret, nil
+	})
+
+	if claims, ok := token.Claims.(*Claims); ok && token.Valid {
+		return claims, nil
+	}
+	return nil, err
 }

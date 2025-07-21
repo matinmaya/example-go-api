@@ -15,5 +15,6 @@ func Migrate(db *gorm.DB) {
 		&rolemodel.RolePermission{},
 		&usermodel.User{},
 		&usermodel.UserRole{},
+		&usermodel.TokenInfo{},
 	)
 }

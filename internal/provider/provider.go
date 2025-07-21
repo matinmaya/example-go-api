@@ -6,6 +6,7 @@ import (
 	"reapp/internal/middleware/dbmdw"
 	"reapp/internal/middleware/langmdw"
 	"reapp/internal/middleware/loggermdw"
+	"reapp/internal/models"
 	"reapp/internal/modules/user/usermigration"
 	"reapp/internal/router"
 	"reapp/pkg/basemodel"
@@ -34,7 +35,7 @@ func NewProvider(r *gin.Engine, db *gorm.DB, cf *config.Config) *Provider {
 func (p *Provider) RegisterServiceProvider() *Provider {
 	jwthelper.SetSecret(p.cf.JWT.Secret)
 
-	p.db.AutoMigrate(&basemodel.SysLog{})
+	p.db.AutoMigrate(&basemodel.SysLog{}, &models.RequestLog{})
 	usermigration.Migrate(p.db)
 
 	vlt := validators.InitValidation(p.db, validator.New())
