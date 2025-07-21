@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
+	"reapp/config"
 	"reapp/internal/helpers/redishelper"
 	"reapp/internal/provider"
-	"reapp/pkg/env"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,9 +12,9 @@ import (
 func main() {
 	r := gin.Default()
 
-	cf := env.Load("config/config.yaml")
-	db, _ := env.DialMysql(cf)
-	redisClient, _ := env.DialRedis(cf)
+	cf := config.Load("config/config.yaml")
+	db, _ := config.DialMysql(cf)
+	redisClient, _ := config.DialRedis(cf)
 	redishelper.InitRedis(redisClient)
 
 	provider.NewProvider(r, db, cf).RegisterServiceProvider().RegisterRouteProvider()

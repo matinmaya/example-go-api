@@ -3,13 +3,13 @@ package main
 import (
 	"fmt"
 	"log"
+	"reapp/config"
 	"reapp/internal/modules/user/userseeder"
-	"reapp/pkg/env"
 )
 
 func main() {
-	cf := env.Load("config/config.yaml")
-	db, _ := env.DialMysql(cf)
+	cf := config.Load("config/config.yaml")
+	db, _ := config.DialMysql(cf)
 
 	if err := userseeder.Run(db); err != nil {
 		log.Fatalf("Seed failed: %v", err)

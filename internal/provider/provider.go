@@ -1,13 +1,13 @@
 package provider
 
 import (
+	"reapp/config"
 	"reapp/internal/helpers/jwthelper"
 	"reapp/internal/middleware"
 	"reapp/internal/middleware/dbmiddleware"
 	"reapp/internal/modules/user/usermigration"
 	"reapp/internal/router"
 	"reapp/pkg/basemodel"
-	"reapp/pkg/env"
 	"reapp/pkg/register"
 	"reapp/pkg/validators"
 
@@ -19,10 +19,10 @@ import (
 type Provider struct {
 	r  *gin.Engine
 	db *gorm.DB
-	cf *env.Config
+	cf *config.Config
 }
 
-func NewProvider(r *gin.Engine, db *gorm.DB, cf *env.Config) *Provider {
+func NewProvider(r *gin.Engine, db *gorm.DB, cf *config.Config) *Provider {
 	return &Provider{
 		r:  r,
 		db: db,
