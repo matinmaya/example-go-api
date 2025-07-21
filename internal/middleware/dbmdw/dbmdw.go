@@ -1,4 +1,4 @@
-package dbmiddleware
+package dbmdw
 
 import (
 	"reapp/internal/helpers/ctxhelper"

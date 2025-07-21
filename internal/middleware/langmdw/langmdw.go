@@ -1,4 +1,4 @@
-package middleware
+package langmdw
 
 import (
 	"strings"

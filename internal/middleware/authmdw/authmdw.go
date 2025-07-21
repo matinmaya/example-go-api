@@ -1,4 +1,4 @@
-package authmiddleware
+package authmdw
 
 import (
 	"net/http"

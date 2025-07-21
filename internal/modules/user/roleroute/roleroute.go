@@ -1,7 +1,7 @@
 package roleroute
 
 import (
-	"reapp/internal/middleware/authmiddleware"
+	"reapp/internal/middleware/authmdw"
 	"reapp/internal/modules/user/rolehandler"
 	"reapp/internal/modules/user/rolerepository"
 	"reapp/internal/modules/user/roleservice"
@@ -17,14 +17,14 @@ func UseRoleRoute() {
 }
 
 func (RoleRoute) RegisterRoute(rg *gin.RouterGroup) {
-	auth := authmiddleware.AuthRequired()
+	auth := authmdw.AuthRequired()
 	r := rg.Group("/roles").Use(auth)
 	h := rolehandler.NewRoleHandler(roleservice.NewRoleService(rolerepository.NewRoleRepository()))
 
-	r.GET("", authmiddleware.Can("roles.read"), h.List)
-	r.GET("/all", authmiddleware.Can("roles.read"), h.GetAll)
-	r.POST("", authmiddleware.Can("roles.create"), h.Create)
-	r.PUT("/:id", authmiddleware.Can("roles.update"), h.Update)
-	r.DELETE("/:id", authmiddleware.Can("roles.delete"), h.Delete)
-	r.GET("/:id", authmiddleware.Can("roles.detail"), h.GetDetail)
+	r.GET("", authmdw.Can("roles.read"), h.List)
+	r.GET("/all", authmdw.Can("roles.read"), h.GetAll)
+	r.POST("", authmdw.Can("roles.create"), h.Create)
+	r.PUT("/:id", authmdw.Can("roles.update"), h.Update)
+	r.DELETE("/:id", authmdw.Can("roles.delete"), h.Delete)
+	r.GET("/:id", authmdw.Can("roles.detail"), h.GetDetail)
 }

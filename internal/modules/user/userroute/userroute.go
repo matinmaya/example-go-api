@@ -1,7 +1,7 @@
 package userroute
 
 import (
-	"reapp/internal/middleware/authmiddleware"
+	"reapp/internal/middleware/authmdw"
 	"reapp/internal/modules/user/userhandler"
 	"reapp/internal/modules/user/userrepository"
 	"reapp/internal/modules/user/userservice"
@@ -17,13 +17,13 @@ func UseUserRoute() {
 }
 
 func (UserRoute) RegisterRoute(rg *gin.RouterGroup) {
-	auth := authmiddleware.AuthRequired()
+	auth := authmdw.AuthRequired()
 	r := rg.Group("/users").Use(auth)
 	h := userhandler.NewUserHandler(userservice.NewUserService(userrepository.NewUserRepository()))
 
-	r.GET("", authmiddleware.Can("users.read"), h.List)
-	r.POST("", authmiddleware.Can("users.create"), h.Create)
-	r.PUT("/:id", authmiddleware.Can("users.update"), h.Update)
-	r.DELETE("/:id", authmiddleware.Can("users.delete"), h.Delete)
-	r.POST("/change-password", authmiddleware.Can("users.change-password"), h.ChangePassword)
+	r.GET("", authmdw.Can("users.read"), h.List)
+	r.POST("", authmdw.Can("users.create"), h.Create)
+	r.PUT("/:id", authmdw.Can("users.update"), h.Update)
+	r.DELETE("/:id", authmdw.Can("users.delete"), h.Delete)
+	r.POST("/change-password", authmdw.Can("users.change-password"), h.ChangePassword)
 }

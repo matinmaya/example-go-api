@@ -3,8 +3,9 @@ package provider
 import (
 	"reapp/config"
 	"reapp/internal/helpers/jwthelper"
-	"reapp/internal/middleware"
-	"reapp/internal/middleware/dbmiddleware"
+	"reapp/internal/middleware/dbmdw"
+	"reapp/internal/middleware/langmdw"
+	"reapp/internal/middleware/loggermdw"
 	"reapp/internal/modules/user/usermigration"
 	"reapp/internal/router"
 	"reapp/pkg/basemodel"
@@ -43,8 +44,9 @@ func (p *Provider) RegisterServiceProvider() *Provider {
 }
 
 func (p *Provider) RegisterRouteProvider() *Provider {
-	p.r.Use(middleware.Language())
-	p.r.Use(dbmiddleware.WithDBContext(p.db))
+	p.r.Use(loggermdw.RequestLogger(p.db))
+	p.r.Use(langmdw.Language())
+	p.r.Use(dbmdw.WithDBContext(p.db))
 
 	router.NewRouter(p.r, p.db).UseAdminRouter().UseFrontendRouter().UseNotFoundRouter()
 	register.InjectRoutes(p.r.Group("/"))
