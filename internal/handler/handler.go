@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func PaginateList(ctx *gin.Context, query any, modelService service.Lister) {
+func PaginateList(ctx *gin.Context, query any, moduleService service.Lister) {
 	db := ctxhelper.GetDB(ctx)
 	var pagination paginator.Pagination
 
@@ -35,7 +35,7 @@ func PaginateList(ctx *gin.Context, query any, modelService service.Lister) {
 	queryValues := ctx.Request.URL.Query()
 	filters := filterscopes.ParseQueryByUrlValues(query, queryValues)
 
-	if err := modelService.List(db, &pagination, filters); err != nil {
+	if err := moduleService.List(db, &pagination, filters); err != nil {
 		response.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}

@@ -23,6 +23,13 @@ type Config struct {
 
 	dsn string
 
+	Redis struct {
+		Host     string `yaml:"host"`
+		Port     int    `yaml:"port"`
+		Password string `yaml:"password"`
+		DB       int    `yaml:"db"`
+	} `yaml:"redis"`
+
 	JWT struct {
 		Secret            string `yaml:"secret"`
 		Issuer            string `yaml:"issuer"`

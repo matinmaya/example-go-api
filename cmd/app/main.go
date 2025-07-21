@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"reapp/internal/helpers/redishelper"
 	"reapp/internal/provider"
 	"reapp/pkg/env"
 
@@ -13,6 +14,8 @@ func main() {
 
 	cf := env.Load("config/config.yaml")
 	db, _ := env.DialMysql(cf)
+	redisClient, _ := env.DialRedis(cf)
+	redishelper.InitRedis(redisClient)
 
 	provider.NewProvider(r, db, cf).RegisterServiceProvider().RegisterRouteProvider()
 

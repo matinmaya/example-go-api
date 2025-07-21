@@ -1,0 +1,60 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+*.o
+*.a
+
+# Output of go build
+/app
+/main
+/main.exe
+
+# Go workspace file
+go.work
+go.work.sum
+
+# Dependency directories (go mod tidy will re-create)
+vendor/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Env files
+.env
+.env.*
+
+# Coverage reports
+*.coverprofile
+*.cov
+coverage.out
+
+# Docker files
+docker-compose.override.yml
+
+# Cache
+**/.cache/
+**/tmp/
+
+# Gin-specific (optional, depending on usage)
+gin-bin/
+
+# Go test binary output (when running tests)
+*.test
+
+# Debug symbols (Delve)
+*.dSYM

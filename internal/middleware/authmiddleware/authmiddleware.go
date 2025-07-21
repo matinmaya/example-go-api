@@ -62,6 +62,7 @@ func AuthRequired() gin.HandlerFunc {
 
 		ctx.Request = ctx.Request.WithContext(authctx.SetUserID(ctx.Request.Context(), claims.UserID))
 		ctx.Set(ctxhelper.GetCxtDBKey(), db.WithContext(ctx.Request.Context()))
+		ctx.Set("user_id", claims.RoleIDs)
 		ctx.Set("role_ids", claims.RoleIDs)
 		ctx.Next()
 	}
