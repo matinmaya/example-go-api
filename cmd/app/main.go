@@ -12,7 +12,9 @@ import (
 func main() {
 	r := gin.Default()
 
-	cf := config.Load("config/config.yaml")
+	env := gin.Mode()
+	configPath := fmt.Sprintf("config/config.%s.yaml", env)
+	cf := config.Load(configPath)
 	db, _ := config.DialMysql(cf)
 	redisClient, _ := config.DialRedis(cf)
 	redishelper.InitRedis(redisClient)
