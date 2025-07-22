@@ -2,6 +2,7 @@ package roleservice
 
 import (
 	"fmt"
+	"reapp/internal/lang"
 	"reapp/internal/modules/user/rolemodel"
 	"reapp/internal/modules/user/rolerepository"
 	"reapp/pkg/filterscopes"
@@ -50,15 +51,15 @@ func (s *RoleService) GetDetail(db *gorm.DB, id uint16) (*rolemodel.Role, error)
 
 func (s *RoleService) Delete(db *gorm.DB, id uint16) error {
 	if _, err := s.repository.GetByID(db, id); err != nil {
-		return fmt.Errorf("role not found")
+		return fmt.Errorf("%s", lang.TranByDB(db, "response", "error"))
 	}
 
 	count, err := s.repository.RoleUserCount(db, id)
 	if err != nil {
-		return fmt.Errorf("failed to count role users: %w", err)
+		return fmt.Errorf("%s", lang.TranByDB(db, "response", "error"))
 	}
 	if count > 0 {
-		return fmt.Errorf("can't delete role: it is still assigned to %d user(s)", count)
+		return fmt.Errorf("%s", lang.TranByDB(db, "response", "error"))
 	}
 
 	return s.repository.Delete(db, id)

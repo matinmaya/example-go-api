@@ -8,6 +8,7 @@ import (
 
 	"reapp/internal/helpers/ctxhelper"
 	"reapp/internal/helpers/redishelper"
+	"reapp/internal/lang"
 	"reapp/internal/modules/user/rolemodel"
 	"reapp/pkg/response"
 
@@ -19,7 +20,7 @@ func Can(requiredPms string) gin.HandlerFunc {
 		db := ctxhelper.GetDB(ctx)
 		userIDValue, exists := ctx.Get("user_id")
 		if !exists {
-			response.Error(ctx, http.StatusUnauthorized, "User ID not found", nil)
+			response.Error(ctx, http.StatusUnauthorized, lang.Tran(ctx, "permission", "user_id_not_found"), nil)
 			ctx.Abort()
 			return
 		}
@@ -36,14 +37,14 @@ func Can(requiredPms string) gin.HandlerFunc {
 			roleIDsValue, _ := ctx.Get("role_ids")
 			roleIDs, ok := roleIDsValue.([]uint16)
 			if !ok || len(roleIDs) == 0 {
-				response.Error(ctx, http.StatusUnauthorized, "Invalid role data", nil)
+				response.Error(ctx, http.StatusUnauthorized, lang.Tran(ctx, "permission", "invalid_role_data"), nil)
 				ctx.Abort()
 				return
 			}
 
 			var roles []rolemodel.Role
 			if err := db.Preload("Permissions").Where("id IN ?", roleIDs).Find(&roles).Error; err != nil {
-				response.Error(ctx, http.StatusForbidden, "Roles not found", nil)
+				response.Error(ctx, http.StatusForbidden, lang.Tran(ctx, "permission", "roles_not_found"), nil)
 				ctx.Abort()
 				return
 			}
@@ -71,7 +72,7 @@ func Can(requiredPms string) gin.HandlerFunc {
 		}
 
 		if !hasPermission {
-			response.Error(ctx, http.StatusForbidden, "Insufficient permissions", nil)
+			response.Error(ctx, http.StatusForbidden, lang.Tran(ctx, "permission", "insufficient_permission"), nil)
 			ctx.Abort()
 			return
 		}

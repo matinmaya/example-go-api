@@ -3,6 +3,7 @@ package authservice
 import (
 	"fmt"
 	"reapp/internal/helpers/redishelper"
+	"reapp/internal/lang"
 	"reapp/internal/modules/user/usermodel"
 	"reapp/internal/modules/user/userrepository"
 	"reapp/pkg/hashcrypto"
@@ -40,11 +41,11 @@ func (s *AuthService) GetUserByID(db *gorm.DB, id uint32) (*usermodel.User, erro
 func (s *AuthService) Attempt(db *gorm.DB, cdt usermodel.AuthCredentials) (*usermodel.User, error) {
 	user, err := s.repository.GetByUsername(db, cdt.Username)
 	if err != nil {
-		return nil, fmt.Errorf("invalid credentials")
+		return nil, fmt.Errorf("%s", lang.TranByDB(db, "auth", "invalid_credentials"))
 	}
 
 	if !hashcrypto.HashCheck(cdt.Password, user.Password) {
-		return nil, fmt.Errorf("invalid credentials")
+		return nil, fmt.Errorf("%s", lang.TranByDB(db, "auth", "invalid_credentials"))
 	}
 
 	return user, nil

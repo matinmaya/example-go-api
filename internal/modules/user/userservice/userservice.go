@@ -2,6 +2,7 @@ package userservice
 
 import (
 	"fmt"
+	"reapp/internal/lang"
 	"reapp/internal/modules/user/usermodel"
 	"reapp/internal/modules/user/userrepository"
 	"reapp/pkg/filterscopes"
@@ -31,7 +32,7 @@ func NewUserService(r *userrepository.UserRepository) IUserService {
 func (s *UserService) Create(db *gorm.DB, user *usermodel.User) error {
 	password, err := hashcrypto.HashMake(user.Password)
 	if err != nil {
-		return fmt.Errorf("failed to hash password: %v", err)
+		return fmt.Errorf("%s", lang.TranByDB(db, "auth", "failed_has_password"))
 	}
 
 	user.Password = password
@@ -40,7 +41,7 @@ func (s *UserService) Create(db *gorm.DB, user *usermodel.User) error {
 
 func (s *UserService) Update(db *gorm.DB, user *usermodel.User) error {
 	if _, err := s.repository.GetByID(db, user.ID); err != nil {
-		return fmt.Errorf("something went wrong")
+		return fmt.Errorf("%s", lang.TranByDB(db, "response", "error"))
 	}
 
 	return s.repository.Update(db, user)
@@ -61,12 +62,12 @@ func (s *UserService) List(db *gorm.DB, pg *paginator.Pagination, filters []filt
 func (s *UserService) ChangePassword(db *gorm.DB, data usermodel.ChangePassword) error {
 	user, err := s.repository.GetByID(db, data.UserID)
 	if err != nil {
-		return fmt.Errorf("something went wrong")
+		return fmt.Errorf("%s", lang.TranByDB(db, "response", "error"))
 	}
 
 	password, err := hashcrypto.HashMake(data.NewPassword)
 	if err != nil {
-		return fmt.Errorf("invalid password")
+		return fmt.Errorf("%s", lang.TranByDB(db, "auth", "failed_has_password"))
 	}
 	user.Password = password
 

@@ -5,6 +5,7 @@ import (
 	"reapp/internal/helpers/ctxhelper"
 	"reapp/internal/helpers/jwthelper"
 	"reapp/internal/helpers/loghelper"
+	"reapp/internal/lang"
 	"reapp/internal/modules/user/authservice"
 	"reapp/internal/modules/user/usermodel"
 	"reapp/pkg/basemodel"
@@ -51,7 +52,7 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 
 	hashedRefreshToken := hashcrypto.HashMakeToken(refreshToken)
 	if hashedRefreshToken == "" {
-		response.Error(ctx, http.StatusInternalServerError, "Failed to hash refresh token", nil)
+		response.Error(ctx, http.StatusInternalServerError, lang.Tran(ctx, "auth", "failed_to_hash_refresh"), nil)
 		return
 	}
 
@@ -72,7 +73,7 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 		ExpiresAt:    expiresAt,
 	}
 	if err := h.service.SaveTokenInfo(db, tokenInfo); err != nil {
-		response.Error(ctx, http.StatusInternalServerError, "Failed to save token info", nil)
+		response.Error(ctx, http.StatusInternalServerError, lang.Tran(ctx, "auth", "failed_to_save_token"), nil)
 		return
 	}
 
@@ -81,7 +82,7 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}
-	response.Success(ctx, http.StatusOK, "login success", data)
+	response.Success(ctx, http.StatusOK, lang.Tran(ctx, "auth", "login_success"), data)
 }
 
 func (h *AuthHandler) Refresh(ctx *gin.Context) {
@@ -95,19 +96,19 @@ func (h *AuthHandler) Refresh(ctx *gin.Context) {
 
 	token, isFound := ctx.Get("jwt_token")
 	if !isFound {
-		response.Error(ctx, http.StatusUnauthorized, "No token found", nil)
+		response.Error(ctx, http.StatusUnauthorized, lang.Tran(ctx, "auth", "no_token_found"), nil)
 		return
 	}
 
 	claims, ok := token.(*jwthelper.Claims)
 	if !ok {
-		response.Error(ctx, http.StatusUnauthorized, "Invalid token claims", nil)
+		response.Error(ctx, http.StatusUnauthorized, lang.Tran(ctx, "auth", "invalid_token_claims"), nil)
 		return
 	}
 
 	odlRefreshClaims, err := jwthelper.ParseToken(req.RefreshToken)
 	if err != nil {
-		response.Error(ctx, http.StatusUnauthorized, "Invalid refresh token", nil)
+		response.Error(ctx, http.StatusUnauthorized, lang.Tran(ctx, "auth", "invalid_refresh_token"), nil)
 		return
 	}
 
@@ -115,46 +116,46 @@ func (h *AuthHandler) Refresh(ctx *gin.Context) {
 	jti := odlRefreshClaims.Id
 	tokenInfo, err := h.service.GetTokenInfo(db, userID, jti)
 	if err != nil || tokenInfo == nil {
-		response.Error(ctx, http.StatusUnauthorized, "Refresh token not found", nil)
+		response.Error(ctx, http.StatusUnauthorized, lang.Tran(ctx, "auth", "refresh_token_not_found"), nil)
 		return
 	}
 
 	if time.Now().After(tokenInfo.ExpiresAt.Time) {
-		response.Error(ctx, http.StatusUnauthorized, "Refresh token expired", nil)
+		response.Error(ctx, http.StatusUnauthorized, lang.Tran(ctx, "auth", "refresh_token_expired"), nil)
 		return
 	}
 
 	if !hashcrypto.HashCheckToken(req.RefreshToken, tokenInfo.RefreshToken) {
-		response.Error(ctx, http.StatusUnauthorized, "Refresh token mismatch", nil)
+		response.Error(ctx, http.StatusUnauthorized, lang.Tran(ctx, "auth", "refresh_token_mismatch"), nil)
 		return
 	}
 
 	user, err := h.service.GetUserByID(db, userID)
 	if err != nil {
-		response.Error(ctx, http.StatusInternalServerError, "User not found", nil)
+		response.Error(ctx, http.StatusInternalServerError, lang.Tran(ctx, "auth", "user_not_found_internal"), nil)
 		return
 	}
 
 	accessToken, _, err := jwthelper.GenerateTokenWithExpiry(*user, jwthelper.AccessTokenTTL)
 	if err != nil {
-		response.Error(ctx, http.StatusInternalServerError, "Failed to generate access token", nil)
+		response.Error(ctx, http.StatusInternalServerError, lang.Tran(ctx, "auth", "failed_generate_access"), nil)
 		return
 	}
 
 	newRefreshToken, refreshClaims, err := jwthelper.GenerateTokenWithExpiry(*user, jwthelper.RefreshTokenTTL)
 	if err != nil {
-		response.Error(ctx, http.StatusInternalServerError, "Failed to generate refresh token", nil)
+		response.Error(ctx, http.StatusInternalServerError, lang.Tran(ctx, "auth", "failed_generate_refresh"), nil)
 		return
 	}
 
 	if err := h.service.RevokeAccessToken(claims.Id, time.Unix(claims.ExpiresAt, 0)); err != nil {
-		response.Error(ctx, http.StatusInternalServerError, "Failed to revoke old access token", nil)
+		response.Error(ctx, http.StatusInternalServerError, lang.Tran(ctx, "auth", "failed_revoke_access"), nil)
 		return
 	}
 
 	hashedNewRefresh := hashcrypto.HashMakeToken(newRefreshToken)
 	if hashedNewRefresh == "" {
-		response.Error(ctx, http.StatusInternalServerError, "Failed to hash refresh token", nil)
+		response.Error(ctx, http.StatusInternalServerError, lang.Tran(ctx, "auth", "failed_to_hash_refresh"), nil)
 		return
 	}
 
@@ -162,7 +163,7 @@ func (h *AuthHandler) Refresh(ctx *gin.Context) {
 	tokenInfo.RefreshToken = hashedNewRefresh
 	tokenInfo.ExpiresAt = basemodel.DateTimeFormat{Time: time.Unix(refreshClaims.ExpiresAt, 0)}
 	if err := h.service.UpdateTokenInfo(db, tokenInfo); err != nil {
-		response.Error(ctx, http.StatusInternalServerError, "Failed to update token info", nil)
+		response.Error(ctx, http.StatusInternalServerError, lang.Tran(ctx, "auth", "failed_update_token"), nil)
 		return
 	}
 
@@ -171,33 +172,33 @@ func (h *AuthHandler) Refresh(ctx *gin.Context) {
 		AccessToken:  accessToken,
 		RefreshToken: newRefreshToken,
 	}
-	response.Success(ctx, http.StatusOK, "token refreshed", data)
+	response.Success(ctx, http.StatusOK, lang.Tran(ctx, "auth", "token_refreshed"), data)
 }
 
 func (h *AuthHandler) Logout(ctx *gin.Context) {
 	token, exists := ctx.Get("jwt_token")
 	if !exists {
-		response.Error(ctx, http.StatusUnauthorized, "No token found", nil)
+		response.Error(ctx, http.StatusUnauthorized, lang.Tran(ctx, "auth", "no_token_found"), nil)
 		return
 	}
 
 	claims, ok := token.(*jwthelper.Claims)
 	if !ok {
-		response.Error(ctx, http.StatusUnauthorized, "Invalid token claims", nil)
+		response.Error(ctx, http.StatusUnauthorized, lang.Tran(ctx, "auth", "invalid_token_claims"), nil)
 		return
 	}
 
 	err := h.service.RevokeAccessToken(claims.Id, time.Unix(claims.ExpiresAt, 0))
 	if err != nil {
-		response.Error(ctx, http.StatusInternalServerError, "Failed to revoke token", nil)
+		response.Error(ctx, http.StatusInternalServerError, lang.Tran(ctx, "auth", "failed_revoke_token"), nil)
 		return
 	}
 
 	db := ctxhelper.GetDB(ctx)
 	if err := h.service.DeleteTokenInfo(db, claims.UserID, claims.Id); err != nil {
-		response.Error(ctx, http.StatusInternalServerError, "Failed to delete token info", nil)
+		response.Error(ctx, http.StatusInternalServerError, lang.Tran(ctx, "auth", "failed_delete_token"), nil)
 		return
 	}
 
-	response.Success(ctx, http.StatusOK, "logout success", nil)
+	response.Success(ctx, http.StatusOK, lang.Tran(ctx, "auth", "logout_success"), nil)
 }
