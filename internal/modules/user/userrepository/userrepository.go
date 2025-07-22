@@ -57,9 +57,9 @@ func (UserRepository) SaveTokenInfo(db *gorm.DB, tokenInfo *usermodel.TokenInfo)
 	return db.Save(tokenInfo).Error
 }
 
-func (UserRepository) GetTokenInfoByUserID(db *gorm.DB, userID uint32) (*usermodel.TokenInfo, error) {
+func (UserRepository) GetTokenInfo(db *gorm.DB, userID uint32, jti string) (*usermodel.TokenInfo, error) {
 	var tokenInfo usermodel.TokenInfo
-	err := db.Where("user_id = ?", userID).First(&tokenInfo).Error
+	err := db.Where("user_id = ?", userID).Where("jti = ?", jti).First(&tokenInfo).Error
 
 	return &tokenInfo, err
 }

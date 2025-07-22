@@ -33,7 +33,11 @@ func NewProvider(r *gin.Engine, db *gorm.DB, cf *config.Config) *Provider {
 }
 
 func (p *Provider) RegisterServiceProvider() *Provider {
-	jwthelper.SetSecret(p.cf.JWT.Secret)
+	jwthelper.InitJWT(
+		p.cf.JWT.Secret,
+		p.cf.JWT.AccessTokenTTL,
+		p.cf.JWT.RefreshTokenTTL,
+	)
 
 	p.db.AutoMigrate(&basemodel.SysLog{}, &models.RequestLog{})
 	usermigration.Migrate(p.db)

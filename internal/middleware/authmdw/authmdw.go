@@ -16,7 +16,7 @@ import (
 func AuthRequired() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		db := ctxhelper.GetDB(ctx)
-		if len(jwthelper.GetSecret()) == 0 {
+		if !jwthelper.ExistsSecret() {
 			response.Error(ctx, http.StatusUnauthorized, "JWT secret is not set", nil)
 			ctx.Abort()
 			return

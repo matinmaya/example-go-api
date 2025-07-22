@@ -37,20 +37,20 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 		return
 	}
 
-	accessToken, _, fail := jwthelper.GenerateTokenWithExpiry(*user, 24*time.Hour)
+	accessToken, _, fail := jwthelper.GenerateTokenWithExpiry(*user, jwthelper.AccessTokenTTL)
 	if fail != nil {
 		response.Error(ctx, http.StatusUnauthorized, fail.Error(), nil)
 		return
 	}
 
-	refreshToken, refreshClaims, fail := jwthelper.GenerateTokenWithExpiry(*user, 7*24*time.Hour)
+	refreshToken, refreshClaims, fail := jwthelper.GenerateTokenWithExpiry(*user, jwthelper.RefreshTokenTTL)
 	if fail != nil {
 		response.Error(ctx, http.StatusUnauthorized, fail.Error(), nil)
 		return
 	}
 
-	hashRefreshToken := hashcrypto.HashMakeToken(refreshToken)
-	if hashRefreshToken == "" {
+	hashedRefreshToken := hashcrypto.HashMakeToken(refreshToken)
+	if hashedRefreshToken == "" {
 		response.Error(ctx, http.StatusInternalServerError, "Failed to hash refresh token", nil)
 		return
 	}
@@ -61,7 +61,8 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 	expiresAt := basemodel.DateTimeFormat{Time: time.Unix(refreshClaims.ExpiresAt, 0)}
 	tokenInfo := &usermodel.TokenInfo{
 		UserID:       user.ID,
-		RefreshToken: hashRefreshToken,
+		JTI:          refreshClaims.Id,
+		RefreshToken: hashedRefreshToken,
 		Device:       device,
 		Platform:     platform,
 		Browser:      browser,
@@ -92,16 +93,34 @@ func (h *AuthHandler) Refresh(ctx *gin.Context) {
 		return
 	}
 
-	claims, err := jwthelper.ParseToken(req.RefreshToken)
+	token, isFound := ctx.Get("jwt_token")
+	if !isFound {
+		response.Error(ctx, http.StatusUnauthorized, "No token found", nil)
+		return
+	}
+
+	claims, ok := token.(*jwthelper.Claims)
+	if !ok {
+		response.Error(ctx, http.StatusUnauthorized, "Invalid token claims", nil)
+		return
+	}
+
+	odlRefreshClaims, err := jwthelper.ParseToken(req.RefreshToken)
 	if err != nil {
 		response.Error(ctx, http.StatusUnauthorized, "Invalid refresh token", nil)
 		return
 	}
 
-	userID := claims.UserID
-	tokenInfo, err := h.service.GetTokenInfoByUserID(db, userID)
+	userID := odlRefreshClaims.UserID
+	jti := odlRefreshClaims.Id
+	tokenInfo, err := h.service.GetTokenInfo(db, userID, jti)
 	if err != nil || tokenInfo == nil {
 		response.Error(ctx, http.StatusUnauthorized, "Refresh token not found", nil)
+		return
+	}
+
+	if time.Now().After(tokenInfo.ExpiresAt.Time) {
+		response.Error(ctx, http.StatusUnauthorized, "Refresh token expired", nil)
 		return
 	}
 
@@ -116,15 +135,20 @@ func (h *AuthHandler) Refresh(ctx *gin.Context) {
 		return
 	}
 
-	accessToken, _, err := jwthelper.GenerateTokenWithExpiry(*user, 24*time.Hour)
+	accessToken, _, err := jwthelper.GenerateTokenWithExpiry(*user, jwthelper.AccessTokenTTL)
 	if err != nil {
 		response.Error(ctx, http.StatusInternalServerError, "Failed to generate access token", nil)
 		return
 	}
 
-	newRefreshToken, refreshClaims, err := jwthelper.GenerateTokenWithExpiry(*user, 7*24*time.Hour)
+	newRefreshToken, refreshClaims, err := jwthelper.GenerateTokenWithExpiry(*user, jwthelper.RefreshTokenTTL)
 	if err != nil {
 		response.Error(ctx, http.StatusInternalServerError, "Failed to generate refresh token", nil)
+		return
+	}
+
+	if err := h.service.RevokeAccessToken(claims.Id, time.Unix(claims.ExpiresAt, 0)); err != nil {
+		response.Error(ctx, http.StatusInternalServerError, "Failed to revoke old access token", nil)
 		return
 	}
 
@@ -134,6 +158,7 @@ func (h *AuthHandler) Refresh(ctx *gin.Context) {
 		return
 	}
 
+	tokenInfo.JTI = refreshClaims.Id
 	tokenInfo.RefreshToken = hashedNewRefresh
 	tokenInfo.ExpiresAt = basemodel.DateTimeFormat{Time: time.Unix(refreshClaims.ExpiresAt, 0)}
 	if err := h.service.UpdateTokenInfo(db, tokenInfo); err != nil {

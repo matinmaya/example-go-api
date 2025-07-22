@@ -9,6 +9,8 @@ import (
 )
 
 var JWTSecret = []byte("")
+var AccessTokenTTL = 60 * time.Minute
+var RefreshTokenTTL = 30 * 24 * time.Hour
 
 type Claims struct {
 	UserID   uint32   `json:"user_id"`
@@ -17,12 +19,20 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-func SetSecret(secret string) {
+// InitJWT initializes JWT helper settings including the secret key and token lifetimes.
+// It sets the signing secret and defines the expiration durations for access and refresh tokens.
+// Parameters:
+// - secret: the secret key used to sign JWT tokens.
+// - accessTokenTTL: duration in minutes before the access token expires.
+// - refreshTokenTTL: duration in minutes before the refresh token expires.
+func InitJWT(secret string, accessTokenTTL int, refreshTokenTTL int) {
 	JWTSecret = []byte(secret)
+	AccessTokenTTL = time.Duration(accessTokenTTL) * time.Minute
+	RefreshTokenTTL = time.Duration(refreshTokenTTL) * time.Minute
 }
 
-func GetSecret() []byte {
-	return JWTSecret
+func ExistsSecret() bool {
+	return len(JWTSecret) > 0
 }
 
 func GenerateTokenWithExpiry(user usermodel.User, duration time.Duration) (string, jwt.StandardClaims, error) {

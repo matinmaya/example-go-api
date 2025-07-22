@@ -5,6 +5,7 @@ import "reapp/pkg/basemodel"
 type TokenInfo struct {
 	ID           uint64                   `json:"id" gorm:"primaryKey"`
 	UserID       uint32                   `json:"user_id" gorm:"not null;index"`
+	JTI          string                   `json:"jti" gorm:"not null;type:varchar(64);uniqueIndex"`
 	RefreshToken string                   `json:"refresh_token" gorm:"not null;type:varchar(255);uniqueIndex"`
 	Device       string                   `json:"device" gorm:"not null;type:varchar(100);"`
 	Platform     string                   `json:"platform" gorm:"not null;type:varchar(50);"`

@@ -31,9 +31,10 @@ type Config struct {
 	} `yaml:"redis"`
 
 	JWT struct {
-		Secret            string `yaml:"secret"`
-		Issuer            string `yaml:"issuer"`
-		ExpirationMinutes int    `yaml:"expiration_minutes"`
+		Secret          string `yaml:"secret"`
+		Issuer          string `yaml:"issuer"`
+		AccessTokenTTL  int    `yaml:"access_token_ttl"`
+		RefreshTokenTTL int    `yaml:"refresh_token_ttl"`
 	} `yaml:"jwt"`
 }
 
