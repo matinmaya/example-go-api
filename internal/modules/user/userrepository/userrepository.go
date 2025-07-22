@@ -68,6 +68,6 @@ func (UserRepository) UpdateTokenInfo(db *gorm.DB, tokenInfo *usermodel.TokenInf
 	return db.Save(tokenInfo).Error
 }
 
-func (UserRepository) DeleteTokenInfoByUserID(db *gorm.DB, userID uint32) error {
-	return db.Where("user_id = ?", userID).Delete(&usermodel.TokenInfo{}).Error
+func (UserRepository) DeleteTokenInfo(db *gorm.DB, userID uint32, jti string) error {
+	return db.Where("user_id = ?", userID).Where("jti = ?", jti).Delete(&usermodel.TokenInfo{}).Error
 }

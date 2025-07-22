@@ -17,7 +17,7 @@ type IAuthService interface {
 	SaveTokenInfo(db *gorm.DB, tokenInfo *usermodel.TokenInfo) error
 	GetTokenInfo(db *gorm.DB, userID uint32, jti string) (*usermodel.TokenInfo, error)
 	UpdateTokenInfo(db *gorm.DB, tokenInfo *usermodel.TokenInfo) error
-	DeleteTokenInfoByUserID(db *gorm.DB, userID uint32) error
+	DeleteTokenInfo(db *gorm.DB, userID uint32, jti string) error
 	RevokeAccessToken(jti string, expiresAt time.Time) error
 }
 
@@ -62,8 +62,8 @@ func (s *AuthService) UpdateTokenInfo(db *gorm.DB, tokenInfo *usermodel.TokenInf
 	return s.repository.UpdateTokenInfo(db, tokenInfo)
 }
 
-func (s *AuthService) DeleteTokenInfoByUserID(db *gorm.DB, userID uint32) error {
-	return s.repository.DeleteTokenInfoByUserID(db, userID)
+func (s *AuthService) DeleteTokenInfo(db *gorm.DB, userID uint32, jti string) error {
+	return s.repository.DeleteTokenInfo(db, userID, jti)
 }
 
 func (s *AuthService) RevokeAccessToken(jti string, expiresAt time.Time) error {

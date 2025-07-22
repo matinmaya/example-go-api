@@ -194,7 +194,7 @@ func (h *AuthHandler) Logout(ctx *gin.Context) {
 	}
 
 	db := ctxhelper.GetDB(ctx)
-	if err := h.service.DeleteTokenInfoByUserID(db, claims.UserID); err != nil {
+	if err := h.service.DeleteTokenInfo(db, claims.UserID, claims.Id); err != nil {
 		response.Error(ctx, http.StatusInternalServerError, "Failed to delete token info", nil)
 		return
 	}
