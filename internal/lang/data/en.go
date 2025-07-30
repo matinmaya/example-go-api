@@ -40,6 +40,9 @@ var EN = map[string]map[string]string{
 		"success": "Operation successful",
 		"error":   "something went wrong",
 	},
+	"internal": {
+		"required_pointer": "the destination data must be provided as a reference",
+	},
 	"validation": {
 		"failed":          "Validation failed",
 		"invalid_request": "Invalid request",

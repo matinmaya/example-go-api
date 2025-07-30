@@ -39,6 +39,9 @@ var KM = map[string]map[string]string{
 		"success": "ប្រតិបត្តិការជោគជ័យ",
 		"error":   "មានបញ្ហាក្នុងការប្រតិបត្តិការ",
 	},
+	"internal": {
+		"required_pointer": "ត្រូវផ្តល់ទិន្នន័យគោលដៅជាអថេរបញ្ជាក់",
+	},
 	"validation": {
 		"failed":          "បរាជ័យក្នុងការផ្ទៀងផ្ទាត់",
 		"invalid_request": "សំណើមិនត្រឹមត្រូវ",

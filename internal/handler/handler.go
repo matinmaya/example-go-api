@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"reapp/internal/helpers/ctxhelper"
+	"reapp/internal/lang"
 	"reapp/internal/service"
 	"reapp/pkg/filterscopes"
 	"reapp/pkg/paginator"
@@ -18,7 +19,7 @@ func PaginateList(ctx *gin.Context, query any, moduleService service.Lister) {
 
 	valueOfQuery := reflect.ValueOf(query)
 	if valueOfQuery.Kind() != reflect.Ptr {
-		response.Error(ctx, http.StatusInternalServerError, "the destination data must be provided as a reference", nil)
+		response.Error(ctx, http.StatusInternalServerError, lang.Tran(ctx, "internal", "required_pointer"), nil)
 		return
 	}
 

@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"reapp/internal/handler"
 	"reapp/internal/helpers/ctxhelper"
+	"reapp/internal/lang"
 	"reapp/internal/modules/user/rolemodel"
 	"reapp/internal/modules/user/roleservice"
 	"reapp/pkg/binding"
@@ -42,8 +43,15 @@ func (h *RoleHandler) Create(ctx *gin.Context) {
 		return
 	}
 
+	db.Begin()
 	err := h.service.Create(db, &role)
-	response.AsJSON(ctx, role, err)
+	if err != nil {
+		db.Rollback()
+		response.Error(ctx, http.StatusBadRequest, lang.ErrorMessage(ctx), nil)
+		return
+	}
+	db.Commit()
+	response.Success(ctx, http.StatusOK, lang.SuccessMessage(ctx), role)
 }
 
 func (h *RoleHandler) Update(ctx *gin.Context) {
@@ -76,8 +84,15 @@ func (h *RoleHandler) Update(ctx *gin.Context) {
 		return
 	}
 
+	db.Begin()
 	err := h.service.Update(db, role)
-	response.AsJSON(ctx, role, err)
+	if err != nil {
+		db.Rollback()
+		response.Error(ctx, http.StatusBadRequest, lang.ErrorMessage(ctx), nil)
+		return
+	}
+	db.Commit()
+	response.Success(ctx, http.StatusOK, lang.SuccessMessage(ctx), role)
 }
 
 func (h *RoleHandler) GetDetail(ctx *gin.Context) {

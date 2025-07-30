@@ -39,6 +39,9 @@ var ZH = map[string]map[string]string{
 		"success": "操作成功",
 		"error":   "操作过程中出现问题",
 	},
+	"internal": {
+		"required_pointer": "目标数据必须以引用的方式提供",
+	},
 	"validation": {
 		"failed":          "验证失败",
 		"invalid_request": "请求无效",

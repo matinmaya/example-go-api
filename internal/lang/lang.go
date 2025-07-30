@@ -41,3 +41,13 @@ func TranByDB(db *gorm.DB, group, key string) string {
 	lang := ctxhelper.GetLangByDBContext(db)
 	return Get(lang, group, key)
 }
+
+func SuccessMessage(ctx *gin.Context) string {
+	lang := ctx.MustGet("lang").(string)
+	return Get(lang, "response", "success")
+}
+
+func ErrorMessage(ctx *gin.Context) string {
+	lang := ctx.MustGet("lang").(string)
+	return Get(lang, "response", "error")
+}
