@@ -18,6 +18,7 @@ import (
 
 type TScopeFunc func(any) error
 type TScopeWithIDFunc func(any, uint64) error
+type TRemoveFieldsFunc func(*[]string) error
 
 type IServiceLister interface {
 	List(db *gorm.DB, pagination *paginator.Pagination, filters []filterscopes.QueryFilter) error
@@ -109,6 +110,7 @@ func Create[T any](
 	model T,
 	modelDTO any,
 	setValidationScope TScopeFunc,
+	formatResponse func(model T) error,
 ) {
 	db := ctxhelper.GetDB(ctx)
 	valueOfModelDTO := reflect.ValueOf(modelDTO)
@@ -145,6 +147,13 @@ func Create[T any](
 		return
 	}
 
+	if formatResponse != nil {
+		if err := formatResponse(model); err != nil {
+			response.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+			return
+		}
+	}
+
 	response.Success(ctx, http.StatusOK, lang.Tran(ctx, "response", "success"), model)
 }
 
@@ -153,7 +162,8 @@ func Update[T any](
 	service IServiceUpdater[T],
 	modelDTO any,
 	setValidationScope TScopeWithIDFunc,
-	removeFields TScopeFunc,
+	removeFields TRemoveFieldsFunc,
+	formatResponse func(model *T) error,
 ) {
 	db := ctxhelper.GetDB(ctx)
 	valueOfModelDTO := reflect.ValueOf(modelDTO)
@@ -207,6 +217,12 @@ func Update[T any](
 		return
 	}
 
+	if formatResponse != nil {
+		if err := formatResponse(model); err != nil {
+			response.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+			return
+		}
+	}
 	response.Success(ctx, http.StatusOK, lang.Tran(ctx, "response", "success"), model)
 }
 

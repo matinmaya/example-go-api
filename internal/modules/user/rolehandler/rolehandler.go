@@ -30,7 +30,7 @@ func (h *RoleHandler) GetDetail(ctx *gin.Context) {
 }
 
 func (h *RoleHandler) Create(ctx *gin.Context) {
-	basehandler.Create(ctx, h.service, &rolemodel.Role{}, &rolemodel.Role{}, nil)
+	basehandler.Create(ctx, h.service, &rolemodel.Role{}, &rolemodel.Role{}, nil, nil)
 }
 
 func (h *RoleHandler) Update(ctx *gin.Context) {
@@ -39,7 +39,10 @@ func (h *RoleHandler) Update(ctx *gin.Context) {
 			dto.ScopeUnique = validators.ExceptByID(id)
 		}
 		return nil
-	}, nil)
+	}, nil, func(model *rolemodel.Role) error {
+		model.PermissionIds = []uint32{}
+		return nil
+	})
 }
 
 func (h *RoleHandler) Delete(ctx *gin.Context) {
