@@ -1,13 +1,11 @@
 package userhandler
 
 import (
-	"net/http"
-	"reapp/internal/handler"
-	"reapp/internal/helpers/ctxhelper"
 	"reapp/internal/modules/user/usermodel"
 	"reapp/internal/modules/user/userservice"
+	"reapp/pkg/base/basehandler"
 	"reapp/pkg/binding"
-	"reapp/pkg/mapper"
+	"reapp/pkg/helpers/ctxhelper"
 	"reapp/pkg/requestutils"
 	"reapp/pkg/response"
 	"reapp/pkg/validators"
@@ -23,78 +21,30 @@ func NewUserHandler(s userservice.IUserService) *UserHandler {
 	return &UserHandler{service: s}
 }
 
+func (h *UserHandler) List(ctx *gin.Context) {
+	basehandler.Paginate(ctx, h.service, &usermodel.UserListQuery{})
+}
+
 func (h *UserHandler) Create(ctx *gin.Context) {
-	db := ctxhelper.GetDB(ctx)
-	fields, bad := requestutils.GetFieldNames(ctx)
-	if bad != nil {
-		response.Error(ctx, http.StatusBadRequest, bad.Error(), nil)
-		return
-	}
-
-	var user usermodel.User
-	var userDto usermodel.User
-	if !binding.ValidateData(ctx, &userDto) {
-		return
-	}
-
-	if err := mapper.MapStruct(&user, userDto, fields); err != nil {
-		response.Error(ctx, http.StatusBadRequest, err.Error(), nil)
-		return
-	}
-
-	err := h.service.Create(db, &user)
-	response.AsJSON(ctx, nil, err)
+	basehandler.Create(ctx, h.service, &usermodel.User{}, &usermodel.User{}, nil)
 }
 
 func (h *UserHandler) Update(ctx *gin.Context) {
-	db := ctxhelper.GetDB(ctx)
-	var id uint64
-	if !binding.ValidateParamID(ctx, &id) {
-		return
-	}
-
-	fields, bad := requestutils.GetFieldNames(ctx)
-	if bad != nil {
-		response.Error(ctx, http.StatusBadRequest, bad.Error(), nil)
-		return
-	}
-
-	requestutils.RemoveFields(&fields, "password")
-	user, fail := h.service.GetByID(db, uint32(id))
-	if fail != nil {
-		response.Error(ctx, http.StatusNotFound, fail.Error(), nil)
-		return
-	}
-
-	var userDto usermodel.User
-	userDto.ScopeUnique = validators.ExceptByID(uint64(id))
-	if !binding.ValidateData(ctx, &userDto) {
-		return
-	}
-
-	if err := mapper.MapStruct(user, userDto, fields); err != nil {
-		response.Error(ctx, http.StatusBadRequest, err.Error(), nil)
-		return
-	}
-
-	err := h.service.Update(db, user)
-	response.AsJSON(ctx, user, err)
+	basehandler.Update(ctx, h.service, &usermodel.User{}, func(modelDTO any, id uint64) error {
+		if dto, ok := modelDTO.(*usermodel.User); ok {
+			dto.ScopeUnique = validators.ExceptByID(id)
+		}
+		return nil
+	}, func(fields any) error {
+		if reqFields, ok := fields.(*[]string); ok {
+			requestutils.RemoveFields(reqFields, "Password")
+		}
+		return nil
+	})
 }
 
 func (h *UserHandler) Delete(ctx *gin.Context) {
-	db := ctxhelper.GetDB(ctx)
-	var id uint64
-	if !binding.ValidateParamID(ctx, &id) {
-		return
-	}
-
-	err := h.service.Delete(db, uint32(id))
-	response.AsJSON(ctx, nil, err)
-}
-
-func (h *UserHandler) List(ctx *gin.Context) {
-	var query usermodel.UserListQuery
-	handler.PaginateList(ctx, &query, h.service)
+	basehandler.Delete(ctx, h.service)
 }
 
 func (h *UserHandler) ChangePassword(ctx *gin.Context) {

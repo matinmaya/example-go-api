@@ -2,32 +2,34 @@ package validators
 
 import (
 	"fmt"
+	"reapp/pkg/lang"
 
+	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator"
 )
 
-func GetMessage(fe validator.FieldError) string {
+func GetMessage(ctx *gin.Context, fe validator.FieldError) string {
 	switch fe.Tag() {
 	case "required":
-		return "This field is required."
+		return lang.Tran(ctx, "validation", "required")
 	case "min":
-		return "Minimum length should be " + fe.Param()
+		return lang.TranWithParams(ctx, "validation", "min", fe.Param())
 	case "max":
-		return "Maximum length should be " + fe.Param()
+		return lang.TranWithParams(ctx, "validation", "max", fe.Param())
 	case "gt":
-		return "Value must be greater than " + fe.Param()
+		return lang.TranWithParams(ctx, "validation", "gt", fe.Param())
 	case "lt":
-		return "Value must be less than " + fe.Param()
+		return lang.TranWithParams(ctx, "validation", "lt", fe.Param())
 	case "email":
-		return "Invalid email format."
+		return lang.Tran(ctx, "validation", "email")
 	case "numeric":
-		return "Must be a numeric value."
+		return lang.Tran(ctx, "validation", "numeric")
 	case "uuid":
-		return "Invalid UUID format."
+		return lang.Tran(ctx, "validation", "uuid")
 	case "unique":
-		return "This value is already taken."
+		return lang.Tran(ctx, "validation", "unique")
 	case "path":
-		return "Path does not exist."
+		return lang.Tran(ctx, "validation", "path")
 	default:
 		return fmt.Sprintf("Validation failed on field '%s' with tag '%s'", fe.Field(), fe.Tag())
 	}

@@ -2,12 +2,12 @@ package authmdw
 
 import (
 	"net/http"
-	"reapp/internal/helpers/ctxhelper"
-	"reapp/internal/helpers/jwthelper"
-	"reapp/internal/helpers/redishelper"
-	"reapp/internal/lang"
 	"reapp/internal/modules/user/usermodel"
 	"reapp/pkg/authctx"
+	"reapp/pkg/helpers/ctxhelper"
+	"reapp/pkg/helpers/jwthelper"
+	"reapp/pkg/helpers/redishelper"
+	"reapp/pkg/lang"
 	"reapp/pkg/response"
 	"strings"
 
@@ -61,7 +61,8 @@ func AuthRequired() gin.HandlerFunc {
 			return
 		}
 
-		ctx.Request = ctx.Request.WithContext(authctx.SetUserID(ctx.Request.Context(), claims.UserID))
+		ctxValue := authctx.SetUserID(ctx.Request.Context(), claims.UserID)
+		ctx.Request = ctx.Request.WithContext(ctxValue)
 		ctx.Set(ctxhelper.GetDBContextKey(), db.WithContext(ctx.Request.Context()))
 		ctx.Set("jwt_token", claims)
 		ctx.Set("user_id", claims.UserID)

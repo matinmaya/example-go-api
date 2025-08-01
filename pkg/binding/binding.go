@@ -3,6 +3,7 @@ package binding
 import (
 	"errors"
 	"net/http"
+	"reapp/pkg/lang"
 	"reapp/pkg/response"
 	"reapp/pkg/validators"
 	"reflect"
@@ -31,23 +32,23 @@ func ValidateData(ctx *gin.Context, dto IRequestDto) bool {
 					jsonTag := field.Tag.Get("json")
 					if jsonTag != "" {
 						jsonKey := strings.Split(jsonTag, ",")[0]
-						fieldErrors[jsonKey] = validators.GetMessage(fieldError)
+						fieldErrors[jsonKey] = validators.GetMessage(ctx, fieldError)
 					} else {
-						fieldErrors[fieldName] = validators.GetMessage(fieldError)
+						fieldErrors[fieldName] = validators.GetMessage(ctx, fieldError)
 					}
 				}
 			}
 
-			response.Error(ctx, http.StatusBadRequest, "validation failed", fieldErrors)
+			response.Error(ctx, http.StatusBadRequest, lang.Tran(ctx, "validation", "failed"), fieldErrors)
 			return false
 		}
 
-		response.Error(ctx, http.StatusBadRequest, "validation failed", map[string]string{"error": err.Error()})
+		response.Error(ctx, http.StatusBadRequest, lang.Tran(ctx, "validation", "failed"), map[string]string{"error": err.Error()})
 		return false
 	}
 
 	if bindingErr != nil {
-		response.Error(ctx, http.StatusBadRequest, "invalid request", map[string]string{"error": bindingErr.Error()})
+		response.Error(ctx, http.StatusBadRequest, lang.Tran(ctx, "validation", "invalid_request"), map[string]string{"error": bindingErr.Error()})
 		return false
 	}
 

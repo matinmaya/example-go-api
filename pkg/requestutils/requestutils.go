@@ -70,12 +70,12 @@ func GetFieldNames(ctx *gin.Context) ([]string, error) {
 func RemoveFields(fields *[]string, targets ...string) {
 	targetSet := make(map[string]struct{}, len(targets))
 	for _, t := range targets {
-		targetSet[t] = struct{}{}
+		targetSet[strings.ToLower(t)] = struct{}{}
 	}
 
 	keptFields := (*fields)[:0]
 	for _, field := range *fields {
-		if _, found := targetSet[field]; !found {
+		if _, found := targetSet[strings.ToLower(field)]; !found {
 			keptFields = append(keptFields, field)
 		}
 	}

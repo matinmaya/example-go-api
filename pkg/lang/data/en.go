@@ -37,8 +37,9 @@ var EN = map[string]map[string]string{
 		"insufficient_permission": "Insufficient permissions",
 	},
 	"response": {
-		"success": "Operation successful",
-		"error":   "something went wrong",
+		"success":   "Operation successful",
+		"error":     "Something went wrong",
+		"not_found": "No data found",
 	},
 	"internal": {
 		"required_pointer": "the destination data must be provided as a reference",

@@ -2,7 +2,7 @@ package rolemodel
 
 import (
 	"reapp/internal/modules/user/permmodel"
-	"reapp/pkg/basemodel"
+	"reapp/pkg/base/basemodel"
 	"reapp/pkg/validators"
 )
 

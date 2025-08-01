@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"reapp/config"
-	"reapp/internal/helpers/redishelper"
 	"reapp/internal/provider"
+	"reapp/pkg/helpers/redishelper"
 
 	"github.com/gin-gonic/gin"
 )

@@ -1,6 +1,6 @@
 package models
 
-import "reapp/pkg/basemodel"
+import "reapp/pkg/base/basemodel"
 
 type RequestLog struct {
 	ID         uint64 `json:"id" gorm:"primaryKey"`

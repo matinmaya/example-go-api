@@ -2,6 +2,7 @@ package response
 
 import (
 	"net/http"
+	"reapp/pkg/lang"
 
 	"github.com/gin-gonic/gin"
 )
@@ -39,15 +40,15 @@ func Error(ctx *gin.Context, code int, message string, err map[string]string) {
 func AsJSON(ctx *gin.Context, data interface{}, err interface{}) {
 	if err != nil {
 		if errMap, ok := err.(map[string]string); ok {
-			Error(ctx, http.StatusInternalServerError, "something went wrong", errMap)
+			Error(ctx, http.StatusInternalServerError, lang.ErrorMessage(ctx), errMap)
 		} else {
 			if errObj, ok := err.(error); ok {
-				Error(ctx, http.StatusInternalServerError, "something went wrong", map[string]string{"error": errObj.Error()})
+				Error(ctx, http.StatusInternalServerError, lang.ErrorMessage(ctx), map[string]string{"error": errObj.Error()})
 			} else {
-				Error(ctx, http.StatusInternalServerError, "something went wrong", nil)
+				Error(ctx, http.StatusInternalServerError, lang.ErrorMessage(ctx), nil)
 			}
 		}
 		return
 	}
-	Success(ctx, http.StatusOK, "success", data)
+	Success(ctx, http.StatusOK, lang.SuccessMessage(ctx), data)
 }

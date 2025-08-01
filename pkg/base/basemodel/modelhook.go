@@ -16,7 +16,6 @@ func (s *SoftFields) BeforeCreate(tx *gorm.DB) error {
 		s.CreatedBy = uid
 		s.UpdatedBy = uid
 	}
-	fmt.Printf("s.CreatedBy: %v\n", s.CreatedBy)
 
 	return nil
 }

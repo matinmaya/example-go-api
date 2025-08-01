@@ -1,8 +1,9 @@
 package lang
 
 import (
-	"reapp/internal/helpers/ctxhelper"
-	langdata "reapp/internal/lang/data"
+	"fmt"
+	"reapp/pkg/helpers/ctxhelper"
+	langdata "reapp/pkg/lang/data"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -50,4 +51,13 @@ func SuccessMessage(ctx *gin.Context) string {
 func ErrorMessage(ctx *gin.Context) string {
 	lang := ctx.MustGet("lang").(string)
 	return Get(lang, "response", "error")
+}
+
+func TranWithParams(ctx *gin.Context, group, key string, params ...any) string {
+	lang := ctx.MustGet("lang").(string)
+	base := Get(lang, group, key)
+	if len(params) > 0 {
+		return fmt.Sprintf("%s %v", base, params[0])
+	}
+	return base
 }

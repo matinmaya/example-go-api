@@ -2,7 +2,7 @@ package usermodel
 
 import (
 	"reapp/internal/modules/user/rolemodel"
-	"reapp/pkg/basemodel"
+	"reapp/pkg/base/basemodel"
 	"reapp/pkg/validators"
 )
 

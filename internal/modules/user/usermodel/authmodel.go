@@ -1,6 +1,6 @@
 package usermodel
 
-import "reapp/pkg/basemodel"
+import "reapp/pkg/base/basemodel"
 
 type TokenInfo struct {
 	ID           uint64                   `json:"id" gorm:"primaryKey"`

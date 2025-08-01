@@ -36,8 +36,9 @@ var KM = map[string]map[string]string{
 		"insufficient_permission": "សិទ្ធិមិនគ្រប់គ្រាន់",
 	},
 	"response": {
-		"success": "ប្រតិបត្តិការជោគជ័យ",
-		"error":   "មានបញ្ហាក្នុងការប្រតិបត្តិការ",
+		"success":   "ប្រតិបត្តិការជោគជ័យ",
+		"error":     "មានបញ្ហាក្នុងការប្រតិបត្តិការ",
+		"not_found": "រកមិនឃើញទិន្នន័យទេ",
 	},
 	"internal": {
 		"required_pointer": "ត្រូវផ្តល់ទិន្នន័យគោលដៅជាអថេរបញ្ជាក់",

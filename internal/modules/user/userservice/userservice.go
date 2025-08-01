@@ -2,11 +2,11 @@ package userservice
 
 import (
 	"fmt"
-	"reapp/internal/lang"
 	"reapp/internal/modules/user/usermodel"
 	"reapp/internal/modules/user/userrepository"
 	"reapp/pkg/filterscopes"
 	"reapp/pkg/hashcrypto"
+	"reapp/pkg/lang"
 	"reapp/pkg/paginator"
 
 	"gorm.io/gorm"
@@ -15,8 +15,8 @@ import (
 type IUserService interface {
 	Create(db *gorm.DB, user *usermodel.User) error
 	Update(db *gorm.DB, user *usermodel.User) error
-	GetByID(db *gorm.DB, id uint32) (*usermodel.User, error)
-	Delete(db *gorm.DB, id uint32) error
+	GetByID(db *gorm.DB, id uint64) (*usermodel.User, error)
+	Delete(db *gorm.DB, id uint64) error
 	List(db *gorm.DB, pg *paginator.Pagination, filters []filterscopes.QueryFilter) error
 	ChangePassword(db *gorm.DB, data usermodel.ChangePassword) error
 }
@@ -47,12 +47,20 @@ func (s *UserService) Update(db *gorm.DB, user *usermodel.User) error {
 	return s.repository.Update(db, user)
 }
 
-func (s *UserService) GetByID(db *gorm.DB, id uint32) (*usermodel.User, error) {
-	return s.repository.GetByID(db, id)
+func (s *UserService) GetByID(db *gorm.DB, id uint64) (*usermodel.User, error) {
+	return s.repository.GetByID(db, uint32(id))
 }
 
-func (s *UserService) Delete(db *gorm.DB, id uint32) error {
-	return s.repository.Delete(db, id)
+func (s *UserService) Delete(db *gorm.DB, id uint64) error {
+	if id < 2 {
+		return fmt.Errorf("%s", lang.TranByDB(db, "response", "error"))
+	}
+
+	if _, err := s.repository.GetByID(db, uint32(id)); err != nil {
+		return fmt.Errorf("%s", lang.TranByDB(db, "response", "not_found"))
+	}
+
+	return s.repository.Delete(db, uint32(id))
 }
 
 func (s *UserService) List(db *gorm.DB, pg *paginator.Pagination, filters []filterscopes.QueryFilter) error {

@@ -2,11 +2,11 @@ package authservice
 
 import (
 	"fmt"
-	"reapp/internal/helpers/redishelper"
-	"reapp/internal/lang"
 	"reapp/internal/modules/user/usermodel"
 	"reapp/internal/modules/user/userrepository"
 	"reapp/pkg/hashcrypto"
+	"reapp/pkg/helpers/redishelper"
+	"reapp/pkg/lang"
 	"time"
 
 	"gorm.io/gorm"
@@ -33,7 +33,7 @@ func NewAuthService(r *userrepository.UserRepository) IAuthService {
 func (s *AuthService) GetUserByID(db *gorm.DB, id uint32) (*usermodel.User, error) {
 	user, err := s.repository.GetByID(db, id)
 	if err != nil {
-		return nil, fmt.Errorf("user not found")
+		return nil, fmt.Errorf("%s", lang.TranByDB(db, "response", "not_found"))
 	}
 	return user, nil
 }

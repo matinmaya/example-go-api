@@ -36,8 +36,9 @@ var ZH = map[string]map[string]string{
 		"insufficient_permission": "权限不足",
 	},
 	"response": {
-		"success": "操作成功",
-		"error":   "操作过程中出现问题",
+		"success":   "操作成功",
+		"error":     "操作过程中出现问题",
+		"not_found": "未找到数据",
 	},
 	"internal": {
 		"required_pointer": "目标数据必须以引用的方式提供",

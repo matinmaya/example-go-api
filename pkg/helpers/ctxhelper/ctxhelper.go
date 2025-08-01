@@ -7,16 +7,15 @@ import (
 	"gorm.io/gorm"
 )
 
-type ctxKey string
+type TContextKey string
 
 const dbContextKey = "db"
-const langContextKey ctxKey = "lang"
+const langContextKey TContextKey = "lang"
 
 func SetDBContext(ctx *gin.Context, db *gorm.DB) {
-	requestContext := ctx.Request.Context()
-	requestContext = context.WithValue(requestContext, langContextKey, ctx.MustGet("lang").(string))
-	dbContext := db.Session(&gorm.Session{Context: requestContext})
-	ctx.Set(dbContextKey, dbContext)
+	ctxValue := context.WithValue(ctx.Request.Context(), langContextKey, ctx.MustGet("lang").(string))
+	ctx.Request = ctx.Request.WithContext(ctxValue)
+	ctx.Set(dbContextKey, db.WithContext(ctx.Request.Context()))
 }
 
 func GetDB(ctx *gin.Context) *gorm.DB {
@@ -34,5 +33,6 @@ func GetLangByDBContext(db *gorm.DB) string {
 	if lang, ok := db.Statement.Context.Value(langContextKey).(string); ok {
 		return lang
 	}
+
 	return "en"
 }

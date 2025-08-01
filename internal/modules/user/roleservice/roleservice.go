@@ -2,10 +2,10 @@ package roleservice
 
 import (
 	"fmt"
-	"reapp/internal/lang"
 	"reapp/internal/modules/user/rolemodel"
 	"reapp/internal/modules/user/rolerepository"
 	"reapp/pkg/filterscopes"
+	"reapp/pkg/lang"
 	"reapp/pkg/paginator"
 
 	"gorm.io/gorm"
@@ -14,9 +14,9 @@ import (
 type IRoleService interface {
 	Create(db *gorm.DB, role *rolemodel.Role) error
 	Update(db *gorm.DB, role *rolemodel.Role) error
-	GetByID(db *gorm.DB, id uint16) (*rolemodel.Role, error)
-	GetDetail(db *gorm.DB, id uint16) (*rolemodel.Role, error)
-	Delete(db *gorm.DB, id uint16) error
+	GetByID(db *gorm.DB, id uint64) (*rolemodel.Role, error)
+	GetDetail(db *gorm.DB, id uint64) (*rolemodel.Role, error)
+	Delete(db *gorm.DB, id uint64) error
 	List(db *gorm.DB, pg *paginator.Pagination, filters []filterscopes.QueryFilter) error
 	GetAll(db *gorm.DB) ([]rolemodel.Role, error)
 }
@@ -35,26 +35,30 @@ func (s *RoleService) Create(db *gorm.DB, role *rolemodel.Role) error {
 
 func (s *RoleService) Update(db *gorm.DB, role *rolemodel.Role) error {
 	if _, err := s.repository.GetByID(db, role.ID); err != nil {
-		return fmt.Errorf("something went wrong")
+		return fmt.Errorf("%s", lang.TranByDB(db, "response", "error"))
 	}
 
 	return s.repository.Update(db, role)
 }
 
-func (s *RoleService) GetByID(db *gorm.DB, id uint16) (*rolemodel.Role, error) {
-	return s.repository.GetByID(db, id)
+func (s *RoleService) GetByID(db *gorm.DB, id uint64) (*rolemodel.Role, error) {
+	return s.repository.GetByID(db, uint16(id))
 }
 
-func (s *RoleService) GetDetail(db *gorm.DB, id uint16) (*rolemodel.Role, error) {
-	return s.repository.GetDetail(db, id)
+func (s *RoleService) GetDetail(db *gorm.DB, id uint64) (*rolemodel.Role, error) {
+	return s.repository.GetDetail(db, uint16(id))
 }
 
-func (s *RoleService) Delete(db *gorm.DB, id uint16) error {
-	if _, err := s.repository.GetByID(db, id); err != nil {
+func (s *RoleService) Delete(db *gorm.DB, id uint64) error {
+	if id < 2 {
 		return fmt.Errorf("%s", lang.TranByDB(db, "response", "error"))
 	}
 
-	count, err := s.repository.RoleUserCount(db, id)
+	if _, err := s.repository.GetByID(db, uint16(id)); err != nil {
+		return fmt.Errorf("%s", lang.TranByDB(db, "response", "not_found"))
+	}
+
+	count, err := s.repository.RoleUserCount(db, uint16(id))
 	if err != nil {
 		return fmt.Errorf("%s", lang.TranByDB(db, "response", "error"))
 	}
@@ -62,7 +66,7 @@ func (s *RoleService) Delete(db *gorm.DB, id uint16) error {
 		return fmt.Errorf("%s", lang.TranByDB(db, "response", "error"))
 	}
 
-	return s.repository.Delete(db, id)
+	return s.repository.Delete(db, uint16(id))
 }
 
 func (s *RoleService) GetAll(db *gorm.DB) ([]rolemodel.Role, error) {

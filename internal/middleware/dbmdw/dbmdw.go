@@ -1,7 +1,7 @@
 package dbmdw
 
 import (
-	"reapp/internal/helpers/ctxhelper"
+	"reapp/pkg/helpers/ctxhelper"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"

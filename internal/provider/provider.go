@@ -2,14 +2,14 @@ package provider
 
 import (
 	"reapp/config"
-	"reapp/internal/helpers/jwthelper"
 	"reapp/internal/middleware/dbmdw"
 	"reapp/internal/middleware/langmdw"
 	"reapp/internal/middleware/loggermdw"
 	"reapp/internal/models"
 	"reapp/internal/modules/user/usermigration"
 	"reapp/internal/router"
-	"reapp/pkg/basemodel"
+	"reapp/pkg/base/basemodel"
+	"reapp/pkg/helpers/jwthelper"
 	"reapp/pkg/register"
 	"reapp/pkg/validators"
 

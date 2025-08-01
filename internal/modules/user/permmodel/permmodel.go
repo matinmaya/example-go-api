@@ -1,7 +1,7 @@
 package permmodel
 
 import (
-	"reapp/pkg/basemodel"
+	"reapp/pkg/base/basemodel"
 	"reapp/pkg/validators"
 )
 

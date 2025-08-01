@@ -2,15 +2,15 @@ package authhandler
 
 import (
 	"net/http"
-	"reapp/internal/helpers/ctxhelper"
-	"reapp/internal/helpers/jwthelper"
-	"reapp/internal/helpers/loghelper"
-	"reapp/internal/lang"
 	"reapp/internal/modules/user/authservice"
 	"reapp/internal/modules/user/usermodel"
-	"reapp/pkg/basemodel"
+	"reapp/pkg/base/basemodel"
 	"reapp/pkg/binding"
 	"reapp/pkg/hashcrypto"
+	"reapp/pkg/helpers/ctxhelper"
+	"reapp/pkg/helpers/jwthelper"
+	"reapp/pkg/helpers/loghelper"
+	"reapp/pkg/lang"
 	"reapp/pkg/response"
 	"time"
 

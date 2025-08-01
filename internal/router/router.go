@@ -5,6 +5,7 @@ import (
 	"reapp/internal/modules/user/authroute"
 	"reapp/internal/modules/user/roleroute"
 	"reapp/internal/modules/user/userroute"
+	"reapp/pkg/lang"
 	"reapp/pkg/response"
 
 	"github.com/gin-gonic/gin"
@@ -33,7 +34,7 @@ func (r *Router) UseFrontendRouter() *Router {
 
 func (r *Router) UseNotFoundRouter() *Router {
 	r.route.NoRoute(func(ctx *gin.Context) {
-		response.Error(ctx, http.StatusNotFound, "not found", nil)
+		response.Error(ctx, http.StatusNotFound, lang.Tran(ctx, "response", "not_found"), nil)
 	})
 	return r
 }
