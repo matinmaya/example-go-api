@@ -56,5 +56,6 @@ var KM = map[string]map[string]string{
 		"uuid":            "ទ្រង់ទ្រាយ UUID មិនត្រឹមត្រូវ",
 		"unique":          "តម្លៃនេះមានរួចហើយ",
 		"path":            "មិនមានផ្លូវនេះទេ",
+		"boolean":         "តម្លៃត្រូវតែជាប៊ូលីន (true ឬ false)",
 	},
 }

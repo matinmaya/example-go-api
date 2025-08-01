@@ -66,3 +66,22 @@ func (r *RoleRepository) RoleUserCount(db *gorm.DB, id uint16) (int, error) {
 	err := db.Model(&usermodel.UserRole{}).Where("role_id = ?", id).Count(&count).Error
 	return int(count), err
 }
+
+func (r *RoleRepository) RemovePermissions(db *gorm.DB, roleID uint16) error {
+	return db.Where("role_id = ?", roleID).Delete(&rolemodel.RolePermission{}).Error
+}
+
+func (r *RoleRepository) AddPermissions(db *gorm.DB, roleID uint16, permissionIDs []uint32) error {
+	if len(permissionIDs) == 0 {
+		return nil
+	}
+
+	var data []rolemodel.RolePermission
+	for _, pid := range permissionIDs {
+		data = append(data, rolemodel.RolePermission{
+			RoleID:       roleID,
+			PermissionID: pid,
+		})
+	}
+	return db.Create(&data).Error
+}

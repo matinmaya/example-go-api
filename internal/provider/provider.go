@@ -5,7 +5,6 @@ import (
 	"reapp/internal/middleware/dbmdw"
 	"reapp/internal/middleware/langmdw"
 	"reapp/internal/middleware/loggermdw"
-	"reapp/internal/models"
 	"reapp/internal/modules/user/usermigration"
 	"reapp/internal/router"
 	"reapp/pkg/base/basemodel"
@@ -39,7 +38,7 @@ func (p *Provider) RegisterServiceProvider() *Provider {
 		p.cf.JWT.RefreshTokenTTL,
 	)
 
-	p.db.AutoMigrate(&basemodel.SysLog{}, &models.RequestLog{})
+	p.db.AutoMigrate(&basemodel.SysLog{}, &basemodel.RequestLog{})
 	usermigration.Migrate(p.db)
 
 	vlt := validators.InitValidation(p.db, validator.New())

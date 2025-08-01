@@ -33,7 +33,7 @@ func Run(db *gorm.DB) error {
 	superAdminRole := rolemodel.Role{
 		Name:        "superadmin",
 		Description: "Super Administrator with full permissions",
-		Status:      1,
+		Status:      true,
 	}
 	db.FirstOrCreate(&superAdminRole, rolemodel.Role{Name: superAdminRole.Name})
 
@@ -56,7 +56,7 @@ func Run(db *gorm.DB) error {
 	admin := usermodel.User{
 		Username: "superadmin",
 		Password: psw,
-		Status:   1,
+		Status:   true,
 	}
 	db.FirstOrCreate(&admin, usermodel.User{Username: admin.Username})
 

@@ -8,7 +8,8 @@ import (
 )
 
 func main() {
-	cf := config.Load("config/config.yaml")
+	configPath := fmt.Sprintf("config/application/config.%s.yaml", "debug")
+	cf := config.Load(configPath)
 	db, _ := config.DialMysql(cf)
 
 	if err := userseeder.Run(db); err != nil {

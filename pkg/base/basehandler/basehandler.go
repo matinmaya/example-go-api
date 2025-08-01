@@ -1,7 +1,6 @@
 package basehandler
 
 import (
-	"fmt"
 	"net/http"
 	"reapp/pkg/binding"
 	"reapp/pkg/filterscopes"
@@ -196,7 +195,7 @@ func Update[T any](
 			return
 		}
 	}
-	fmt.Printf("Fields to update: %v\n", fields)
+
 	if err := mapper.MapStruct(model, modelDTO, fields); err != nil {
 		response.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return

@@ -30,7 +30,22 @@ func NewRoleService(r *rolerepository.RoleRepository) IRoleService {
 }
 
 func (s *RoleService) Create(db *gorm.DB, role *rolemodel.Role) error {
-	return s.repository.Create(db, role)
+	tx := db.Begin()
+	if err := s.repository.Create(tx, role); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
+	}
+
+	if err := s.repository.AddPermissions(tx, role.ID, role.PermissionIds); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
+	}
+
+	return nil
 }
 
 func (s *RoleService) Update(db *gorm.DB, role *rolemodel.Role) error {
@@ -38,7 +53,27 @@ func (s *RoleService) Update(db *gorm.DB, role *rolemodel.Role) error {
 		return fmt.Errorf("%s", lang.TranByDB(db, "response", "error"))
 	}
 
-	return s.repository.Update(db, role)
+	tx := db.Begin()
+	if err := s.repository.Update(tx, role); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
+	}
+
+	if err := s.repository.RemovePermissions(tx, role.ID); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
+	}
+
+	if err := s.repository.AddPermissions(tx, role.ID, role.PermissionIds); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
+	}
+
+	return nil
 }
 
 func (s *RoleService) GetByID(db *gorm.DB, id uint64) (*rolemodel.Role, error) {

@@ -3,7 +3,7 @@ package loggermdw
 import (
 	"bytes"
 	"io"
-	"reapp/internal/models"
+	"reapp/pkg/base/basemodel"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -19,7 +19,7 @@ func RequestLogger(db *gorm.DB) gin.HandlerFunc {
 
 		c.Next()
 
-		log := models.RequestLog{
+		log := basemodel.RequestLog{
 			Method:     c.Request.Method,
 			Path:       c.Request.URL.Path,
 			Query:      c.Request.URL.RawQuery,

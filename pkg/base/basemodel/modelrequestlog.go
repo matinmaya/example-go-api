@@ -1,6 +1,4 @@
-package models
-
-import "reapp/pkg/base/basemodel"
+package basemodel
 
 type RequestLog struct {
 	ID         uint64 `json:"id" gorm:"primaryKey"`
@@ -11,7 +9,7 @@ type RequestLog struct {
 	UserAgent  string
 	IP         string
 	StatusCode int
-	CreatedAt  basemodel.DateTimeFormat `json:"created_at"`
+	CreatedAt  DateTimeFormat `json:"created_at"`
 }
 
 func (RequestLog) TableName() string {

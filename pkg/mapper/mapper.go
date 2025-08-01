@@ -3,6 +3,7 @@ package mapper
 import (
 	"errors"
 	"reflect"
+	"strings"
 )
 
 func CloneStructFields(sourceStruct interface{}, fieldNames []string) map[string]interface{} {
@@ -16,7 +17,7 @@ func CloneStructFields(sourceStruct interface{}, fieldNames []string) map[string
 			continue
 		}
 		for _, fieldName := range fieldNames {
-			if field.Name == fieldName {
+			if strings.EqualFold(field.Name, fieldName) {
 				fields[field.Name] = sourceValue.Field(idx).Interface()
 				break
 			}

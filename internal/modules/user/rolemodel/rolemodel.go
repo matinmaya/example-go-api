@@ -8,10 +8,11 @@ import (
 
 type Role struct {
 	basemodel.SmallPrimaryKey
-	Name        string                 `json:"name" gorm:"unique;not null;type:varchar(50);" validate:"required,max=50,unique=sys_roles?id"`
-	Description string                 `json:"description" gorm:"type:varchar(255);" validate:"max=255"`
-	Status      uint8                  `json:"status" gorm:"not null;default:0;"`
-	Permissions []permmodel.Permission `json:"permissions,omitempty" gorm:"many2many:sys_role_permission;"`
+	Name          string                 `json:"name" gorm:"unique;not null;type:varchar(50);" validate:"required,max=50,unique=sys_roles?id"`
+	Description   string                 `json:"description" gorm:"type:varchar(255);" validate:"max=255"`
+	Status        bool                   `json:"status" gorm:"not null;default:false;"`
+	Permissions   []permmodel.Permission `json:"permissions,omitempty" gorm:"many2many:sys_role_permission;"`
+	PermissionIds []uint32               `json:"permission_ids,omitempty" gorm:"-"`
 	basemodel.SoftFields
 	validators.ValidateScopeUnique
 }

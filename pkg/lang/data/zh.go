@@ -56,5 +56,6 @@ var ZH = map[string]map[string]string{
 		"uuid":            "UUID 格式无效",
 		"unique":          "该值已被使用",
 		"path":            "路径不存在",
+		"boolean":         "值必须是布尔类型（true 或 false）",
 	},
 }

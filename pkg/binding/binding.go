@@ -1,6 +1,7 @@
 package binding
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 	"reapp/pkg/lang"
@@ -14,9 +15,9 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-type IRequestDto interface{}
+type IRequestDTO interface{}
 
-func ValidateData(ctx *gin.Context, dto IRequestDto) bool {
+func ValidateData(ctx *gin.Context, dto IRequestDTO) bool {
 	bindingErr := ctx.ShouldBindJSON(dto)
 
 	if err := validators.Validate.Struct(dto); err != nil {
@@ -48,7 +49,16 @@ func ValidateData(ctx *gin.Context, dto IRequestDto) bool {
 	}
 
 	if bindingErr != nil {
-		response.Error(ctx, http.StatusBadRequest, lang.Tran(ctx, "validation", "invalid_request"), map[string]string{"error": bindingErr.Error()})
+		var unmarshalTypeErr *json.UnmarshalTypeError
+		if errors.As(bindingErr, &unmarshalTypeErr) && unmarshalTypeErr.Type.Kind() == reflect.Bool {
+			fieldName := unmarshalTypeErr.Field
+			response.Error(ctx, http.StatusBadRequest, lang.Tran(ctx, "validation", "failed"), map[string]string{
+				fieldName: lang.Tran(ctx, "validation", "boolean"),
+			})
+			return false
+		}
+
+		response.Error(ctx, http.StatusBadRequest, lang.Tran(ctx, "validation", "failed"), map[string]string{"error": bindingErr.Error()})
 		return false
 	}
 

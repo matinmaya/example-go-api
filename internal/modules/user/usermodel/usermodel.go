@@ -10,7 +10,7 @@ type User struct {
 	basemodel.PrimaryKey
 	Username string           `json:"username" gorm:"unique;not null;type:varchar(50);" validate:"required,min=6,max=50,unique=sys_users?id"`
 	Password string           `json:"-" gorm:"not null;type:varchar(120);"`
-	Status   uint8            `json:"status" gorm:"not null;default=0;" validate:"min=0,max=1"`
+	Status   bool             `json:"status" gorm:"not null;default=false;"`
 	Roles    []rolemodel.Role `json:"roles,omitempty" gorm:"many2many:sys_user_role;"`
 	basemodel.SoftFields
 	validators.ValidateScopeUnique

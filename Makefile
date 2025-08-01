@@ -1,4 +1,4 @@
-debug:
+dev:
 	GIN_MODE=debug go run cmd/app/main.go
 
 test:

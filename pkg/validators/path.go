@@ -6,12 +6,7 @@ import (
 	"strings"
 
 	"github.com/go-playground/validator/v10"
-	"gorm.io/gorm"
 )
-
-type ValidateScopePath struct {
-	ScopePath func() func(db *gorm.DB) *gorm.DB `json:"-" gorm:"-"`
-}
 
 func Path(fl validator.FieldLevel) bool {
 	fieldValue := fl.Field().String()
