@@ -28,7 +28,10 @@ func (h *UserHandler) List(ctx *gin.Context) {
 }
 
 func (h *UserHandler) Create(ctx *gin.Context) {
-	basehandler.Create(ctx, h.service, &usermodel.User{}, &usermodel.User{}, nil, nil)
+	basehandler.Create(ctx, h.service, &usermodel.User{}, &usermodel.User{}, nil, func(user *usermodel.User) error {
+		user.RoleIds = []uint16{}
+		return nil
+	})
 }
 
 func (h *UserHandler) Update(ctx *gin.Context) {
@@ -40,7 +43,10 @@ func (h *UserHandler) Update(ctx *gin.Context) {
 	}, func(fields *[]string) error {
 		requestutils.RemoveFields(fields, "Password")
 		return nil
-	}, nil)
+	}, func(user *usermodel.User) error {
+		user.RoleIds = []uint16{}
+		return nil
+	})
 }
 
 func (h *UserHandler) Delete(ctx *gin.Context) {

@@ -12,6 +12,7 @@ type User struct {
 	Password string           `json:"-" gorm:"not null;type:varchar(120);"`
 	Status   bool             `json:"status" gorm:"not null;default=false;"`
 	Roles    []rolemodel.Role `json:"roles,omitempty" gorm:"many2many:sys_user_role;"`
+	RoleIds  []uint16         `json:"role_ids,omitempty" gorm:"-" validate:"required"`
 	basemodel.SoftFields
 	validators.ValidateScopeUnique
 }

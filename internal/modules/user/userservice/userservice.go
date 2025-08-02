@@ -35,8 +35,24 @@ func (s *UserService) Create(db *gorm.DB, user *usermodel.User) error {
 		return fmt.Errorf("%s", lang.TranByDB(db, "auth", "failed_has_password"))
 	}
 
+	tx := db.Begin()
+	roleIds := user.RoleIds
 	user.Password = password
-	return s.repository.Create(db, user)
+	if err := s.repository.Create(tx, user); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
+	}
+
+	if err := s.repository.AsyncUserRoles(tx, user, roleIds); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
+	}
+
+	return nil
 }
 
 func (s *UserService) Update(db *gorm.DB, user *usermodel.User) error {
@@ -44,7 +60,23 @@ func (s *UserService) Update(db *gorm.DB, user *usermodel.User) error {
 		return fmt.Errorf("%s", lang.TranByDB(db, "response", "error"))
 	}
 
-	return s.repository.Update(db, user)
+	tx := db.Begin()
+	roleIds := user.RoleIds
+	if err := s.repository.Update(tx, user); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
+	}
+
+	if err := s.repository.AsyncUserRoles(tx, user, roleIds); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
+	}
+
+	return nil
 }
 
 func (s *UserService) GetByID(db *gorm.DB, id uint64) (*usermodel.User, error) {

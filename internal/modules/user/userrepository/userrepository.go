@@ -1,6 +1,8 @@
 package userrepository
 
 import (
+	"fmt"
+	"reapp/internal/modules/user/rolemodel"
 	"reapp/internal/modules/user/usermodel"
 	"reapp/pkg/filterscopes"
 	"reapp/pkg/paginator"
@@ -70,4 +72,28 @@ func (UserRepository) UpdateTokenInfo(db *gorm.DB, tokenInfo *usermodel.TokenInf
 
 func (UserRepository) DeleteTokenInfo(db *gorm.DB, userID uint32, jti string) error {
 	return db.Where("user_id = ?", userID).Where("jti = ?", jti).Delete(&usermodel.TokenInfo{}).Error
+}
+
+func (UserRepository) AsyncUserRoles(db *gorm.DB, user *usermodel.User, roleIds []uint16) error {
+	if err := db.Model(user).Association("Roles").Clear(); err != nil {
+		return err
+	}
+
+	if len(roleIds) == 0 {
+		return nil
+	}
+
+	var roles []rolemodel.Role
+	if err := db.Where("id IN ?", roleIds).Find(&roles).Error; err != nil {
+		return err
+	}
+
+	fmt.Printf("roles count %v\n", db.Model(user).Association("Roles").Count())
+
+	// error here
+	if err := db.Model(user).Association("Roles").Replace(&roles); err != nil {
+		return err
+	}
+
+	return nil
 }

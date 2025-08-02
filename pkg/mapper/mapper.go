@@ -5,11 +5,13 @@ import (
 	"strings"
 )
 
-func GetFieldsOfDTO(modelDTO any, fieldNames []string) map[string]any {
+type TFields map[string]any
+
+func GetFieldsOfDTO(modelDTO any, fieldNames []string) TFields {
 	dtoValue := reflect.Indirect(reflect.ValueOf(modelDTO))
 	dtoType := dtoValue.Type()
 
-	fields := make(map[string]any)
+	fields := make(TFields)
 	for idx := 0; idx < dtoType.NumField(); idx++ {
 		field := dtoType.Field(idx)
 		if field.PkgPath != "" {
@@ -26,7 +28,7 @@ func GetFieldsOfDTO(modelDTO any, fieldNames []string) map[string]any {
 	return fields
 }
 
-func AssignFieldValuesToModel(model any, fields map[string]any) error {
+func AssignFieldValuesToModel(model any, fields TFields) error {
 	modelValue := reflect.ValueOf(model)
 	if modelValue.Kind() == reflect.Ptr {
 		modelValue = modelValue.Elem()
