@@ -33,7 +33,7 @@ type IServiceGetterDetail[T any] interface {
 }
 
 type IServiceCreator[T any] interface {
-	Create(db *gorm.DB, model T) error
+	Create(db *gorm.DB, model *T) error
 }
 
 type IServiceUpdater[T any] interface {
@@ -104,21 +104,15 @@ func GetDetail[T any](ctx *gin.Context, service IServiceGetterDetail[T]) {
 	response.Success(ctx, http.StatusOK, lang.Tran(ctx, "response", "success"), data)
 }
 
-func Create[T any](
+func Create[T1 any, T2 any](
 	ctx *gin.Context,
-	service IServiceCreator[T],
-	model T,
-	modelDTO any,
+	service IServiceCreator[T1],
+	model *T1,
+	modelDTO *T2,
 	setValidationScope TScopeFunc,
-	formatResponse func(model T) error,
+	formatResponse func(model *T1) error,
 ) {
 	db := ctxhelper.GetDB(ctx)
-	valueOfModelDTO := reflect.ValueOf(modelDTO)
-	if valueOfModelDTO.Kind() != reflect.Ptr {
-		response.Error(ctx, http.StatusInternalServerError, lang.Tran(ctx, "internal", "required_pointer"), nil)
-		return
-	}
-
 	fields, bad := requestutils.GetFieldNames(ctx)
 	if bad != nil {
 		response.Error(ctx, http.StatusBadRequest, bad.Error(), nil)
@@ -136,7 +130,7 @@ func Create[T any](
 		return
 	}
 
-	if err := mapper.MapStruct(model, modelDTO, fields); err != nil {
+	if err := mapper.AssignModelValues(model, modelDTO, fields); err != nil {
 		response.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
@@ -157,21 +151,15 @@ func Create[T any](
 	response.Success(ctx, http.StatusOK, lang.Tran(ctx, "response", "success"), model)
 }
 
-func Update[T any](
+func Update[T1 any, T2 any](
 	ctx *gin.Context,
-	service IServiceUpdater[T],
-	modelDTO any,
+	service IServiceUpdater[T1],
+	modelDTO *T2,
 	setValidationScope TScopeWithIDFunc,
 	removeFields TRemoveFieldsFunc,
-	formatResponse func(model *T) error,
+	formatResponse func(model *T1) error,
 ) {
 	db := ctxhelper.GetDB(ctx)
-	valueOfModelDTO := reflect.ValueOf(modelDTO)
-	if valueOfModelDTO.Kind() != reflect.Ptr {
-		response.Error(ctx, http.StatusInternalServerError, lang.Tran(ctx, "internal", "required_pointer"), nil)
-		return
-	}
-
 	var id uint64
 	if !binding.ValidateParamID(ctx, &id) {
 		return
@@ -206,7 +194,7 @@ func Update[T any](
 		}
 	}
 
-	if err := mapper.MapStruct(model, modelDTO, fields); err != nil {
+	if err := mapper.AssignModelValues(model, modelDTO, fields); err != nil {
 		response.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}

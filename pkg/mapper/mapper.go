@@ -1,24 +1,23 @@
 package mapper
 
 import (
-	"errors"
 	"reflect"
 	"strings"
 )
 
-func CloneStructFields(sourceStruct interface{}, fieldNames []string) map[string]interface{} {
-	sourceValue := reflect.Indirect(reflect.ValueOf(sourceStruct))
-	sourceType := sourceValue.Type()
+func GetFieldsOfDTO(modelDTO any, fieldNames []string) map[string]any {
+	dtoValue := reflect.Indirect(reflect.ValueOf(modelDTO))
+	dtoType := dtoValue.Type()
 
-	fields := make(map[string]interface{})
-	for idx := 0; idx < sourceType.NumField(); idx++ {
-		field := sourceType.Field(idx)
+	fields := make(map[string]any)
+	for idx := 0; idx < dtoType.NumField(); idx++ {
+		field := dtoType.Field(idx)
 		if field.PkgPath != "" {
 			continue
 		}
 		for _, fieldName := range fieldNames {
 			if strings.EqualFold(field.Name, fieldName) {
-				fields[field.Name] = sourceValue.Field(idx).Interface()
+				fields[field.Name] = dtoValue.Field(idx).Interface()
 				break
 			}
 		}
@@ -27,14 +26,14 @@ func CloneStructFields(sourceStruct interface{}, fieldNames []string) map[string
 	return fields
 }
 
-func MapStructFields(targetStruct interface{}, fields map[string]interface{}) error {
-	targetValue := reflect.ValueOf(targetStruct)
-	if targetValue.Kind() == reflect.Ptr {
-		targetValue = targetValue.Elem()
+func AssignFieldValuesToModel(model any, fields map[string]any) error {
+	modelValue := reflect.ValueOf(model)
+	if modelValue.Kind() == reflect.Ptr {
+		modelValue = modelValue.Elem()
 	}
 
 	for fieldName, fieldValue := range fields {
-		field := targetValue.FieldByName(fieldName)
+		field := modelValue.FieldByName(fieldName)
 		if !field.IsValid() {
 			return nil
 		}
@@ -53,24 +52,7 @@ func MapStructFields(targetStruct interface{}, fields map[string]interface{}) er
 	return nil
 }
 
-// MapStruct copies selected fields from sourceStruct to targetStruct.
-//
-// Parameters:
-// - targetStruct: a pointer to the struct that will receive the field values.
-// - sourceStruct: the struct to copy values from.
-// - fieldNames: a slice of strings specifying which field names to copy.
-//
-// Returns:
-// - error: if targetStruct is not a pointer, or if type conversion fails.
-//
-// Notes:
-// - Fields must be exported (start with an uppercase letter) to be copied.
-// - Only fields listed in fieldNames and present in both structs will be copied.
-func MapStruct(targetStruct interface{}, sourceStruct interface{}, fieldNames []string) error {
-	targetValue := reflect.ValueOf(targetStruct)
-	if targetValue.Kind() != reflect.Ptr {
-		return errors.New("the destination data must be provided as a reference")
-	}
-	fields := CloneStructFields(sourceStruct, fieldNames)
-	return MapStructFields(targetStruct, fields)
+func AssignModelValues[T any](model *T, modelDTO any, fieldNames []string) error {
+	fields := GetFieldsOfDTO(modelDTO, fieldNames)
+	return AssignFieldValuesToModel(model, fields)
 }
