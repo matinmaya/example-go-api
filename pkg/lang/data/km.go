@@ -28,12 +28,14 @@ var KM = map[string]map[string]string{
 		"failed_revoke_token":          "បរាជ័យក្នុងការដកហូត token",
 		"failed_delete_token":          "បរាជ័យក្នុងការលុប token",
 		"logout_success":               "ចាកចេញដោយជោគជ័យ",
+		"cache_error":                  "មានបញ្ហាក្នុងការផ្ទុកទិន្នន័យអ្នកប្រើ",
 	},
 	"permission": {
 		"user_id_not_found":       "រកមិនឃើញលេខសម្គាល់អ្នកប្រើ",
 		"invalid_role_data":       "ទិន្នន័យតួនាទីមិនត្រឹមត្រូវ",
 		"roles_not_found":         "រកមិនឃើញតួនាទី",
 		"insufficient_permission": "សិទ្ធិមិនគ្រប់គ្រាន់",
+		"cache_error":             "មានបញ្ហាក្នុងការផ្ទុកសិទ្ធិ",
 	},
 	"response": {
 		"success":   "ប្រតិបត្តិការជោគជ័យ",

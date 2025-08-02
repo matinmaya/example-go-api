@@ -28,12 +28,14 @@ var ZH = map[string]map[string]string{
 		"failed_revoke_token":          "吊销令牌失败",
 		"failed_delete_token":          "删除令牌信息失败",
 		"logout_success":               "登出成功",
+		"cache_error":                  "缓存用户数据时出错",
 	},
 	"permission": {
 		"user_id_not_found":       "未找到用户 ID",
 		"invalid_role_data":       "角色数据无效",
 		"roles_not_found":         "未找到角色",
 		"insufficient_permission": "权限不足",
+		"cache_error":             "缓存权限时出错",
 	},
 	"response": {
 		"success":   "操作成功",

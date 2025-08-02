@@ -226,7 +226,7 @@ func Update[T any](
 	response.Success(ctx, http.StatusOK, lang.Tran(ctx, "response", "success"), model)
 }
 
-func Delete(ctx *gin.Context, service IServiceDeleter) {
+func Delete(ctx *gin.Context, service IServiceDeleter, beforeResponse func(*gin.Context) error) {
 	db := ctxhelper.GetDB(ctx)
 	var id uint64
 	if !binding.ValidateParamID(ctx, &id) {
@@ -237,6 +237,13 @@ func Delete(ctx *gin.Context, service IServiceDeleter) {
 	if err != nil {
 		response.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
+	}
+
+	if beforeResponse != nil {
+		if err := beforeResponse(ctx); err != nil {
+			response.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+			return
+		}
 	}
 
 	response.Success(ctx, http.StatusOK, lang.Tran(ctx, "response", "success"), nil)

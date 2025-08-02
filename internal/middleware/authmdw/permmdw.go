@@ -1,14 +1,12 @@
 package authmdw
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	"reapp/internal/modules/user/rolemodel"
+	"reapp/pkg/database/redisdb"
 	"reapp/pkg/helpers/ctxhelper"
-	"reapp/pkg/helpers/redishelper"
 	"reapp/pkg/lang"
 	"reapp/pkg/response"
 
@@ -26,14 +24,8 @@ func Can(requiredPms string) gin.HandlerFunc {
 		}
 
 		userID := fmt.Sprintf("%v", userIDValue)
-		cacheKey := "permissions:user:" + userID
-
-		var permissions []string
-		redisClient := redishelper.Client()
-		cached, err := redisClient.Get(cacheKey).Result()
-		if err == nil {
-			json.Unmarshal([]byte(cached), &permissions)
-		} else {
+		permissions, err := redisdb.GetCacheOfPerms(userID)
+		if err != nil {
 			roleIDsValue, _ := ctx.Get("role_ids")
 			roleIDs, ok := roleIDsValue.([]uint16)
 			if !ok || len(roleIDs) == 0 {
@@ -59,8 +51,11 @@ func Can(requiredPms string) gin.HandlerFunc {
 				permissions = append(permissions, name)
 			}
 
-			bytes, _ := json.Marshal(permissions)
-			redisClient.Set(cacheKey, bytes, time.Hour)
+			if err := redisdb.SetCacheOfPerms(userID, permissions); err != nil {
+				response.Error(ctx, http.StatusInternalServerError, lang.Tran(ctx, "permission", "cache_error"), nil)
+				ctx.Abort()
+				return
+			}
 		}
 
 		hasPermission := false

@@ -1,10 +1,12 @@
 package userhandler
 
 import (
+	"fmt"
 	"reapp/internal/modules/user/usermodel"
 	"reapp/internal/modules/user/userservice"
 	"reapp/pkg/base/basehandler"
 	"reapp/pkg/binding"
+	"reapp/pkg/database/redisdb"
 	"reapp/pkg/helpers/ctxhelper"
 	"reapp/pkg/requestutils"
 	"reapp/pkg/response"
@@ -42,7 +44,11 @@ func (h *UserHandler) Update(ctx *gin.Context) {
 }
 
 func (h *UserHandler) Delete(ctx *gin.Context) {
-	basehandler.Delete(ctx, h.service)
+	basehandler.Delete(ctx, h.service, func(ctx *gin.Context) error {
+		userID, _ := ctx.Get("user_id")
+		go redisdb.RemoveCacheOfAuthUser(fmt.Sprintf("%v", userID))
+		return nil
+	})
 }
 
 func (h *UserHandler) ChangePassword(ctx *gin.Context) {

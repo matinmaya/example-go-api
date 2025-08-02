@@ -29,12 +29,14 @@ var EN = map[string]map[string]string{
 		"failed_delete_token":          "Failed to delete token info",
 		"failed_has_password":          "failed to hash password",
 		"logout_success":               "Logout success",
+		"cache_error":                  "Error while caching user data",
 	},
 	"permission": {
 		"user_id_not_found":       "User ID not found",
 		"invalid_role_data":       "Invalid role data",
 		"roles_not_found":         "Roles not found",
 		"insufficient_permission": "Insufficient permissions",
+		"cache_error":             "Error while caching permissions",
 	},
 	"response": {
 		"success":   "Operation successful",

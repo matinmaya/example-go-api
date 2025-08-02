@@ -1,9 +1,11 @@
 package authmdw
 
 import (
+	"fmt"
 	"net/http"
 	"reapp/internal/modules/user/usermodel"
 	"reapp/pkg/authctx"
+	"reapp/pkg/database/redisdb"
 	"reapp/pkg/helpers/ctxhelper"
 	"reapp/pkg/helpers/jwthelper"
 	"reapp/pkg/helpers/redishelper"
@@ -54,11 +56,19 @@ func AuthRequired() gin.HandlerFunc {
 			}
 		}
 
+		authID := fmt.Sprintf("%d", claims.UserID)
 		var user usermodel.User
-		if err := db.First(&user, claims.UserID).Error; err != nil {
-			response.Error(ctx, http.StatusUnauthorized, lang.Tran(ctx, "auth", "user_not_found"), nil)
-			ctx.Abort()
-			return
+		if err := redisdb.GetCacheOfAuthUser(authID, &user); err != nil {
+			if err := db.Where("id = ?", claims.UserID).First(&user).Error; err != nil {
+				response.Error(ctx, http.StatusUnauthorized, lang.Tran(ctx, "auth", "user_not_found"), nil)
+				ctx.Abort()
+				return
+			}
+			if err := redisdb.SetCacheOfAuthUser(authID, user); err != nil {
+				response.Error(ctx, http.StatusInternalServerError, lang.Tran(ctx, "auth", "cache_error"), nil)
+				ctx.Abort()
+				return
+			}
 		}
 
 		ctxValue := authctx.SetUserID(ctx.Request.Context(), claims.UserID)

@@ -4,6 +4,7 @@ import (
 	"reapp/internal/modules/user/rolemodel"
 	"reapp/internal/modules/user/roleservice"
 	"reapp/pkg/base/basehandler"
+	"reapp/pkg/database/redisdb"
 	"reapp/pkg/validators"
 
 	"github.com/gin-gonic/gin"
@@ -41,10 +42,14 @@ func (h *RoleHandler) Update(ctx *gin.Context) {
 		return nil
 	}, nil, func(model *rolemodel.Role) error {
 		model.PermissionIds = []uint32{}
+		go redisdb.ClearCacheOfPerms()
 		return nil
 	})
 }
 
 func (h *RoleHandler) Delete(ctx *gin.Context) {
-	basehandler.Delete(ctx, h.service)
+	basehandler.Delete(ctx, h.service, func(ctx *gin.Context) error {
+		go redisdb.ClearCacheOfPerms()
+		return nil
+	})
 }
