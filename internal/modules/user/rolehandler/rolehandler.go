@@ -35,20 +35,18 @@ func (h *RoleHandler) Create(ctx *gin.Context) {
 }
 
 func (h *RoleHandler) Update(ctx *gin.Context) {
-	basehandler.Update(ctx, h.service, &rolemodel.Role{}, func(modelDTO any, id uint64) error {
-		if dto, ok := modelDTO.(*rolemodel.Role); ok {
-			dto.ScopeUnique = validators.ExceptByID(id)
-		}
+	basehandler.Update(ctx, h.service, &rolemodel.Role{}, func(role *rolemodel.Role, id uint64) error {
+		role.UniqueScope = validators.ExceptByID(id)
 		return nil
-	}, nil, func(model *rolemodel.Role) error {
-		model.PermissionIds = []uint32{}
+	}, nil, func(role *rolemodel.Role) error {
+		role.PermissionIds = []uint32{}
 		go redisdb.ClearCacheOfPerms()
 		return nil
 	})
 }
 
 func (h *RoleHandler) Delete(ctx *gin.Context) {
-	basehandler.Delete(ctx, h.service, func(ctx *gin.Context) error {
+	basehandler.Delete(ctx, h.service, func(*gin.Context) error {
 		go redisdb.ClearCacheOfPerms()
 		return nil
 	})

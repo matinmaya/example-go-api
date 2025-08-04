@@ -1,8 +1,6 @@
 package userrepository
 
 import (
-	"fmt"
-	"reapp/internal/modules/user/rolemodel"
 	"reapp/internal/modules/user/usermodel"
 	"reapp/pkg/filterscopes"
 	"reapp/pkg/paginator"
@@ -83,17 +81,13 @@ func (UserRepository) AsyncUserRoles(db *gorm.DB, user *usermodel.User, roleIds 
 		return nil
 	}
 
-	var roles []rolemodel.Role
-	if err := db.Where("id IN ?", roleIds).Find(&roles).Error; err != nil {
-		return err
+	var data []usermodel.UserRole
+	for _, roleId := range roleIds {
+		data = append(data, usermodel.UserRole{
+			UserID: user.ID,
+			RoleID: roleId,
+		})
 	}
 
-	fmt.Printf("roles count %v\n", db.Model(user).Association("Roles").Count())
-
-	// error here
-	if err := db.Model(user).Association("Roles").Replace(&roles); err != nil {
-		return err
-	}
-
-	return nil
+	return db.Create(&data).Error
 }

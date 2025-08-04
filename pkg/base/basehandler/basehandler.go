@@ -16,8 +16,8 @@ import (
 	"gorm.io/gorm"
 )
 
-type TScopeFunc func(any) error
-type TScopeWithIDFunc func(any, uint64) error
+type TScopeFunc[T any] func(*T) error
+type TScopeWithIDFunc[T any] func(*T, uint64) error
 type TRemoveFieldsFunc func(*[]string) error
 
 type IServiceLister interface {
@@ -109,7 +109,7 @@ func Create[T1 any, T2 any](
 	service IServiceCreator[T1],
 	model *T1,
 	modelDTO *T2,
-	setValidationScope TScopeFunc,
+	setValidationScope TScopeFunc[T2],
 	formatResponse func(model *T1) error,
 ) {
 	db := ctxhelper.GetDB(ctx)
@@ -155,7 +155,7 @@ func Update[T1 any, T2 any](
 	ctx *gin.Context,
 	service IServiceUpdater[T1],
 	modelDTO *T2,
-	setValidationScope TScopeWithIDFunc,
+	setValidationScope TScopeWithIDFunc[T2],
 	removeFields TRemoveFieldsFunc,
 	formatResponse func(model *T1) error,
 ) {

@@ -14,7 +14,7 @@ type Role struct {
 	Permissions   []permmodel.Permission `json:"permissions,omitempty" gorm:"many2many:sys_role_permission;"`
 	PermissionIds []uint32               `json:"permission_ids,omitempty" gorm:"-"`
 	basemodel.SoftFields
-	validators.ValidateScopeUnique
+	validators.ValidateUniqueScope
 }
 
 func (Role) TableName() string {

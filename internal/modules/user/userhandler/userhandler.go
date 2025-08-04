@@ -35,10 +35,8 @@ func (h *UserHandler) Create(ctx *gin.Context) {
 }
 
 func (h *UserHandler) Update(ctx *gin.Context) {
-	basehandler.Update(ctx, h.service, &usermodel.User{}, func(modelDTO any, id uint64) error {
-		if dto, ok := modelDTO.(*usermodel.User); ok {
-			dto.ScopeUnique = validators.ExceptByID(id)
-		}
+	basehandler.Update(ctx, h.service, &usermodel.User{}, func(user *usermodel.User, id uint64) error {
+		user.UniqueScope = validators.ExceptByID(id)
 		return nil
 	}, func(fields *[]string) error {
 		requestutils.RemoveFields(fields, "Password")

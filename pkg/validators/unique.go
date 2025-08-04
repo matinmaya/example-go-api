@@ -9,8 +9,8 @@ import (
 	"gorm.io/gorm"
 )
 
-type ValidateScopeUnique struct {
-	ScopeUnique func() func(db *gorm.DB) *gorm.DB `json:"-" gorm:"-"`
+type ValidateUniqueScope struct {
+	UniqueScope func() func(db *gorm.DB) *gorm.DB `json:"-" gorm:"-"`
 }
 
 func Unique(fl validator.FieldLevel) bool {
@@ -38,7 +38,7 @@ func Unique(fl validator.FieldLevel) bool {
 	var count int64
 	q := DB.Table(tableName).Where(columnName+" = ?", fieldValue)
 
-	scopeMethod := reflect.ValueOf(fl.Parent().Interface()).FieldByName("ScopeUnique")
+	scopeMethod := reflect.ValueOf(fl.Parent().Interface()).FieldByName("UniqueScope")
 	if scopeMethod.IsValid() && !scopeMethod.IsNil() {
 		results := scopeMethod.Call(nil)
 		if len(results) > 0 {

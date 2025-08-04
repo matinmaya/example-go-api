@@ -14,7 +14,7 @@ type User struct {
 	Roles    []rolemodel.Role `json:"roles,omitempty" gorm:"many2many:sys_user_role;"`
 	RoleIds  []uint16         `json:"role_ids,omitempty" gorm:"-" validate:"required"`
 	basemodel.SoftFields
-	validators.ValidateScopeUnique
+	validators.ValidateUniqueScope
 }
 
 func (User) TableName() string {
