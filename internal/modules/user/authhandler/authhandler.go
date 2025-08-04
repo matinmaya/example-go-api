@@ -38,6 +38,11 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 		return
 	}
 
+	if !user.Status {
+		response.Error(ctx, http.StatusUnauthorized, lang.Tran(ctx, "auth", "account_locked"), nil)
+		return
+	}
+
 	accessToken, _, fail := jwthelper.GenerateTokenWithExpiry(*user, jwthelper.AccessTokenTTL)
 	if fail != nil {
 		response.Error(ctx, http.StatusUnauthorized, fail.Error(), nil)
@@ -133,6 +138,11 @@ func (h *AuthHandler) Refresh(ctx *gin.Context) {
 	user, err := h.service.GetUserByID(db, userID)
 	if err != nil {
 		response.Error(ctx, http.StatusInternalServerError, lang.Tran(ctx, "auth", "user_not_found_internal"), nil)
+		return
+	}
+
+	if !user.Status {
+		response.Error(ctx, http.StatusUnauthorized, lang.Tran(ctx, "auth", "account_locked"), nil)
 		return
 	}
 

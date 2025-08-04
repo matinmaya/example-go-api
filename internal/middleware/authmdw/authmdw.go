@@ -71,6 +71,12 @@ func AuthRequired() gin.HandlerFunc {
 			}
 		}
 
+		if !user.Status {
+			response.Error(ctx, http.StatusUnauthorized, lang.Tran(ctx, "auth", "account_locked"), nil)
+			ctx.Abort()
+			return
+		}
+
 		ctxValue := authctx.SetUserID(ctx.Request.Context(), claims.UserID)
 		ctx.Request = ctx.Request.WithContext(ctxValue)
 		ctx.Set(ctxhelper.GetDBContextKey(), db.WithContext(ctx.Request.Context()))

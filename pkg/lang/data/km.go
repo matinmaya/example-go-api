@@ -2,6 +2,7 @@ package langdata
 
 var KM = map[string]map[string]string{
 	"auth": {
+		"account_locked":               "គណនី​របស់អ្នកត្រូវបានបិទ។ សូមទំនាក់ទំនងផ្នែកគាំទ្រ។",
 		"jwt_secret_not_set":           "មិនបានកំណត់សម្ងាត់ JWT",
 		"authorization_required":       "ត្រូវការបញ្ជាក់អាជ្ញាបណ្ណ",
 		"authorization_invalid_format": "ទ្រង់ទ្រាយបញ្ជាក់អាជ្ញាបណ្ណមិនត្រឹមត្រូវ",

@@ -2,6 +2,7 @@ package langdata
 
 var ZH = map[string]map[string]string{
 	"auth": {
+		"account_locked":               "您的账户已被锁定，请联系客户支持。",
 		"jwt_secret_not_set":           "未设置 JWT 密钥",
 		"authorization_required":       "需要授权标头",
 		"authorization_invalid_format": "授权标头格式无效",

@@ -2,6 +2,7 @@ package langdata
 
 var EN = map[string]map[string]string{
 	"auth": {
+		"account_locked":               "Your account has been locked. Please contact support.",
 		"jwt_secret_not_set":           "JWT secret is not set",
 		"authorization_required":       "Authorization header is required",
 		"authorization_invalid_format": "Invalid authorization header format",

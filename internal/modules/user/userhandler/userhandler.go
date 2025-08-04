@@ -43,6 +43,7 @@ func (h *UserHandler) Update(ctx *gin.Context) {
 		return nil
 	}, func(user *usermodel.User) error {
 		user.RoleIds = []uint16{}
+		go redisdb.RemoveCacheOfAuthUser(fmt.Sprintf("%v", user.ID))
 		return nil
 	})
 }
