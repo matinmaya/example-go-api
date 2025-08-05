@@ -3,7 +3,9 @@ package hashcrypto
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 
+	"github.com/spaolacci/murmur3"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -27,4 +29,9 @@ func HashMakeToken(token string) string {
 
 func HashCheckToken(token string, hashed string) bool {
 	return HashMakeToken(token) == hashed
+}
+
+func HashCacheKey(s string) string {
+	h := murmur3.Sum64([]byte(s))
+	return fmt.Sprintf("%x", h)
 }

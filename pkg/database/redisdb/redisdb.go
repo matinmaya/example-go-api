@@ -97,3 +97,68 @@ func RemoveCacheOfAuthUser(userID string) error {
 	}
 	return nil
 }
+
+func SetCacheOfRepository[T any](namespace string, collection string, key string, params T) error {
+	if namespace == "" {
+		return fmt.Errorf("namespace cannot be empty")
+	}
+	if collection == "" {
+		return fmt.Errorf("collection cannot be empty")
+	}
+	if key == "" {
+		return fmt.Errorf("key cannot be empty")
+	}
+
+	cacheKey := fmt.Sprintf("repositories:%s:%s:%s", namespace, collection, key)
+	redisClient := redishelper.Client()
+	data, err := json.Marshal(params)
+	if err != nil {
+		return err
+	}
+
+	if err := redisClient.Set(cacheKey, data, 5*time.Minute).Err(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func GetCacheOfRepository[T any](namespace string, collection string, key string, data *T) error {
+	if namespace == "" {
+		return fmt.Errorf("namespace cannot be empty")
+	}
+	if collection == "" {
+		return fmt.Errorf("collection cannot be empty")
+	}
+	if key == "" {
+		return fmt.Errorf("key cannot be empty")
+	}
+
+	cacheKey := fmt.Sprintf("repositories:%s:%s:%s", namespace, collection, key)
+	redisClient := redishelper.Client()
+	cached, err := redisClient.Get(cacheKey).Result()
+	if err != nil {
+		return err
+	}
+
+	if err := json.Unmarshal([]byte(cached), data); err != nil {
+		return err
+	}
+	return nil
+}
+
+func ClearCacheOfRepository(namespace string) error {
+	if namespace == "" {
+		return fmt.Errorf("namespace cannot be empty")
+	}
+
+	prefixKey := fmt.Sprintf("repositories:%s:*", namespace)
+	redisClient := redishelper.Client()
+	iter := redisClient.Scan(0, prefixKey, 0).Iterator()
+	for iter.Next() {
+		if err := redisClient.Del(iter.Val()).Err(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}

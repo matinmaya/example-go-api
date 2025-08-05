@@ -2,27 +2,33 @@ package userrepository
 
 import (
 	"reapp/internal/modules/user/usermodel"
+	"reapp/pkg/database/redisdb"
 	"reapp/pkg/filterscopes"
 	"reapp/pkg/paginator"
 
 	"gorm.io/gorm"
 )
 
-type UserRepository struct{}
-
-func NewUserRepository() *UserRepository {
-	return &UserRepository{}
+type UserRepository struct {
+	namespace string
 }
 
-func (UserRepository) Create(db *gorm.DB, user *usermodel.User) error {
+func NewUserRepository() *UserRepository {
+	return &UserRepository{namespace: "user"}
+}
+
+func (r *UserRepository) Create(db *gorm.DB, user *usermodel.User) error {
+	go redisdb.ClearCacheOfRepository(r.namespace)
 	return db.Create(user).Error
 }
 
-func (UserRepository) Update(db *gorm.DB, user *usermodel.User) error {
+func (r *UserRepository) Update(db *gorm.DB, user *usermodel.User) error {
+	go redisdb.ClearCacheOfRepository(r.namespace)
 	return db.Save(user).Error
 }
 
-func (UserRepository) Delete(db *gorm.DB, id uint32) error {
+func (r *UserRepository) Delete(db *gorm.DB, id uint32) error {
+	go redisdb.ClearCacheOfRepository(r.namespace)
 	return db.Delete(&usermodel.User{}, id).Error
 }
 
@@ -33,13 +39,18 @@ func (UserRepository) GetByID(db *gorm.DB, id uint32) (*usermodel.User, error) {
 	return &user, err
 }
 
-func (UserRepository) List(db *gorm.DB, pg *paginator.Pagination, filters []filterscopes.QueryFilter) error {
+func (r *UserRepository) List(db *gorm.DB, pg *paginator.Pagination, filters []filterscopes.QueryFilter) error {
 	var users []usermodel.User
-	scope := paginator.Paginate(db, &usermodel.User{}, pg, filters)
+	scope := paginator.Paginate(db, r.namespace, &usermodel.User{}, pg, filters)
 
-	err := db.Scopes(scope).Find(&users).Error
-	if err != nil {
-		return err
+	collectionKey := "list"
+	if err := redisdb.GetCacheOfRepository(r.namespace, collectionKey, pg.GetListCacheKey(), &users); err != nil {
+		err := db.Scopes(scope).Find(&users).Error
+		if err != nil {
+			return err
+		}
+
+		redisdb.SetCacheOfRepository(r.namespace, collectionKey, pg.GetListCacheKey(), users)
 	}
 
 	pg.SetRows(users)

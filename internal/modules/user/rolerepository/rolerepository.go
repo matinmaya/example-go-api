@@ -3,27 +3,33 @@ package rolerepository
 import (
 	"reapp/internal/modules/user/rolemodel"
 	"reapp/internal/modules/user/usermodel"
+	"reapp/pkg/database/redisdb"
 	"reapp/pkg/filterscopes"
 	"reapp/pkg/paginator"
 
 	"gorm.io/gorm"
 )
 
-type RoleRepository struct{}
+type RoleRepository struct {
+	namespace string
+}
 
 func NewRoleRepository() *RoleRepository {
-	return &RoleRepository{}
+	return &RoleRepository{namespace: "role"}
 }
 
 func (r *RoleRepository) Create(db *gorm.DB, role *rolemodel.Role) error {
+	go redisdb.ClearCacheOfRepository(r.namespace)
 	return db.Create(role).Error
 }
 
 func (r *RoleRepository) Update(db *gorm.DB, role *rolemodel.Role) error {
+	go redisdb.ClearCacheOfRepository(r.namespace)
 	return db.Save(role).Error
 }
 
 func (r *RoleRepository) Delete(db *gorm.DB, id uint16) error {
+	go redisdb.ClearCacheOfRepository(r.namespace)
 	return db.Delete(&rolemodel.Role{}, id).Error
 }
 
@@ -43,18 +49,32 @@ func (r *RoleRepository) GetDetail(db *gorm.DB, id uint16) (*rolemodel.Role, err
 
 func (r *RoleRepository) GetAll(db *gorm.DB) ([]rolemodel.Role, error) {
 	var roles []rolemodel.Role
-	err := db.Order("created_at DESC").Find(&roles).Error
 
-	return roles, err
+	collectionKey := "all"
+	if err := redisdb.GetCacheOfRepository(r.namespace, collectionKey, "data", &roles); err != nil {
+		err := db.Order("created_at DESC").Find(&roles).Error
+		if err != nil {
+			return nil, err
+		}
+
+		redisdb.SetCacheOfRepository(r.namespace, collectionKey, "data", roles)
+	}
+
+	return roles, nil
 }
 
 func (r *RoleRepository) List(db *gorm.DB, pg *paginator.Pagination, filters []filterscopes.QueryFilter) error {
 	var roles []rolemodel.Role
-	scope := paginator.Paginate(db, &rolemodel.Role{}, pg, filters)
+	scope := paginator.Paginate(db, r.namespace, &rolemodel.Role{}, pg, filters)
 
-	err := db.Scopes(scope).Find(&roles).Error
-	if err != nil {
-		return err
+	collectionKey := "list"
+	if err := redisdb.GetCacheOfRepository(r.namespace, collectionKey, pg.GetListCacheKey(), &roles); err != nil {
+		err := db.Scopes(scope).Find(&roles).Error
+		if err != nil {
+			return err
+		}
+
+		redisdb.SetCacheOfRepository(r.namespace, collectionKey, pg.GetListCacheKey(), roles)
 	}
 
 	pg.SetRows(roles)

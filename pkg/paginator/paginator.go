@@ -1,20 +1,26 @@
 package paginator
 
 import (
+	"encoding/json"
 	"math"
+	"reapp/pkg/database/redisdb"
 	"reapp/pkg/filterscopes"
+	"reapp/pkg/hashcrypto"
 
 	"gorm.io/gorm"
 )
 
 type Pagination struct {
-	Limit     int         `json:"limit,omitempty" form:"limit"`
-	Page      int         `json:"page,omitempty" form:"page"`
-	SortBy    string      `json:"sort_by,omitempty" form:"sort_by"`
-	SortDir   string      `json:"sort_dir,omitempty" form:"sort_dir"`
-	Total     int         `json:"total"`
-	TotalPage int         `json:"total_page"`
-	Rows      interface{} `json:"rows"`
+	Limit         int                        `json:"limit,omitempty" form:"limit"`
+	Page          int                        `json:"page,omitempty" form:"page"`
+	SortBy        string                     `json:"sort_by,omitempty" form:"sort_by"`
+	SortDir       string                     `json:"sort_dir,omitempty" form:"sort_dir"`
+	Total         int                        `json:"total"`
+	TotalPage     int                        `json:"total_page"`
+	Filters       []filterscopes.QueryFilter `json:"-"`
+	ListCacheKey  string                     `json:"-"`
+	CountCacheKey string                     `json:"-"`
+	Rows          interface{}                `json:"data"`
 }
 
 func (p *Pagination) GetOffset() int {
@@ -51,25 +57,20 @@ func (p *Pagination) SetRows(rows interface{}) {
 	p.Rows = rows
 }
 
-// Paginate returns a GORM scope that applies filtering, pagination, and sorting.
-//
-// Parameters:
-//   - db: the base GORM DB instance.
-//   - dbModel: the model type for counting total records (e.g., &User{}).
-//   - pg: pointer to a Pagination struct containing page, limit, and sort information.
-//   - filters: slice of QueryFilter values to apply as WHERE conditions.
-//
-// Returns:
-//   - a GORM scope function that applies OFFSET, LIMIT, ORDER, and WHERE clauses.
-func Paginate(db *gorm.DB, dbModel interface{}, pg *Pagination, filters []filterscopes.QueryFilter) func(db *gorm.DB) *gorm.DB {
+func Paginate(db *gorm.DB, repositoryNamespace string, dbModel interface{}, pg *Pagination, filters []filterscopes.QueryFilter) func(db *gorm.DB) *gorm.DB {
 	var total int64
-
-	filteredDB := filterscopes.QueryFilterScopes(db.Model(dbModel), filters)
-	filteredDB.Count(&total)
-
 	if pg.Page < 1 {
 		pg.Page = 1
 	}
+
+	collectionKey := "count"
+	if err := redisdb.GetCacheOfRepository(repositoryNamespace, collectionKey, pg.GetCountCacheKey(), &total); err != nil {
+		filteredDB := filterscopes.QueryFilterScopes(db.Model(dbModel), filters)
+		filteredDB.Count(&total)
+
+		redisdb.SetCacheOfRepository(repositoryNamespace, collectionKey, pg.GetCountCacheKey(), total)
+	}
+
 	pg.Total = int(total)
 	pg.TotalPage = int(math.Ceil(float64(total) / float64(pg.GetLimit())))
 
@@ -77,4 +78,57 @@ func Paginate(db *gorm.DB, dbModel interface{}, pg *Pagination, filters []filter
 		offset := pg.GetOffset()
 		return filterscopes.QueryFilterScopes(db, filters).Offset(offset).Limit(pg.GetLimit()).Order(pg.GetSort())
 	}
+}
+
+func (p *Pagination) GenerateListKey() (string, error) {
+	bFilter, err := json.Marshal(p.Filters)
+	if err != nil {
+		return "", err
+	}
+
+	fields := map[string]interface{}{
+		"Limit":   p.GetLimit(),
+		"Page":    p.GetPage(),
+		"Offset":  p.GetOffset(),
+		"Order":   p.GetSort(),
+		"Filters": string(bFilter),
+	}
+
+	keys, err := json.Marshal(fields)
+	if err != nil {
+		return "", err
+	}
+
+	return hashcrypto.HashCacheKey(string(keys)), nil
+}
+
+func (p *Pagination) GenerateCountKey() (string, error) {
+	bFilter, err := json.Marshal(p.Filters)
+	if err != nil {
+		return "", err
+	}
+
+	return hashcrypto.HashCacheKey(string(bFilter)), nil
+}
+
+func (p *Pagination) GetListCacheKey() string {
+	if p.ListCacheKey == "" {
+		key, err := p.GenerateListKey()
+		if err == nil {
+			p.ListCacheKey = key
+		}
+	}
+
+	return p.ListCacheKey
+}
+
+func (p *Pagination) GetCountCacheKey() string {
+	if p.CountCacheKey == "" {
+		key, err := p.GenerateCountKey()
+		if err == nil {
+			p.CountCacheKey = key
+		}
+	}
+
+	return p.CountCacheKey
 }
