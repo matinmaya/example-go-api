@@ -7,9 +7,22 @@ import (
 	"time"
 )
 
+// private func
+func validateNotEmpty(params map[string]string) error {
+	for name, value := range params {
+		if value == "" {
+			return fmt.Errorf("argument [%s] cannot be empty", name)
+		}
+	}
+	return nil
+}
+
 func GetCacheOfPerms(userID string) ([]string, error) {
-	if userID == "" {
-		return nil, fmt.Errorf("userID cannot be empty")
+	validate := map[string]string{
+		"userID": userID,
+	}
+	if err := validateNotEmpty(validate); err != nil {
+		return nil, err
 	}
 	cacheKey := "permissions:user:" + userID
 	redisClient := redishelper.Client()
@@ -29,6 +42,12 @@ func GetCacheOfPerms(userID string) ([]string, error) {
 }
 
 func SetCacheOfPerms(userID string, permissions []string) error {
+	validate := map[string]string{
+		"userID": userID,
+	}
+	if err := validateNotEmpty(validate); err != nil {
+		return err
+	}
 	cacheKey := "permissions:user:" + userID
 	redisClient := redishelper.Client()
 	data, err := json.Marshal(permissions)
@@ -54,8 +73,11 @@ func ClearCacheOfPerms() error {
 }
 
 func GetCacheOfAuthUser[T any](userID string, auth *T) error {
-	if userID == "" {
-		return fmt.Errorf("userID cannot be empty")
+	validate := map[string]string{
+		"userID": userID,
+	}
+	if err := validateNotEmpty(validate); err != nil {
+		return err
 	}
 	cacheKey := "auth:user:" + userID
 	redisClient := redishelper.Client()
@@ -71,8 +93,11 @@ func GetCacheOfAuthUser[T any](userID string, auth *T) error {
 }
 
 func SetCacheOfAuthUser[T any](userID string, auth T) error {
-	if userID == "" {
-		return fmt.Errorf("userID cannot be empty")
+	validate := map[string]string{
+		"userID": userID,
+	}
+	if err := validateNotEmpty(validate); err != nil {
+		return err
 	}
 	cacheKey := "auth:user:" + userID
 	redisClient := redishelper.Client()
@@ -87,8 +112,11 @@ func SetCacheOfAuthUser[T any](userID string, auth T) error {
 }
 
 func RemoveCacheOfAuthUser(userID string) error {
-	if userID == "" {
-		return nil
+	validate := map[string]string{
+		"userID": userID,
+	}
+	if err := validateNotEmpty(validate); err != nil {
+		return err
 	}
 	cacheKey := "auth:user:" + userID
 	redisClient := redishelper.Client()
@@ -99,14 +127,13 @@ func RemoveCacheOfAuthUser(userID string) error {
 }
 
 func SetCacheOfRepository[T any](namespace string, collection string, key string, params T) error {
-	if namespace == "" {
-		return fmt.Errorf("namespace cannot be empty")
+	validate := map[string]string{
+		"namespace":  namespace,
+		"collection": collection,
+		"key":        key,
 	}
-	if collection == "" {
-		return fmt.Errorf("collection cannot be empty")
-	}
-	if key == "" {
-		return fmt.Errorf("key cannot be empty")
+	if err := validateNotEmpty(validate); err != nil {
+		return err
 	}
 
 	cacheKey := fmt.Sprintf("repositories:%s:%s:%s", namespace, collection, key)
@@ -116,21 +143,20 @@ func SetCacheOfRepository[T any](namespace string, collection string, key string
 		return err
 	}
 
-	if err := redisClient.Set(cacheKey, data, 5*time.Minute).Err(); err != nil {
+	if err := redisClient.Set(cacheKey, data, redishelper.GetRepoCacheDuration()).Err(); err != nil {
 		return err
 	}
 	return nil
 }
 
 func GetCacheOfRepository[T any](namespace string, collection string, key string, data *T) error {
-	if namespace == "" {
-		return fmt.Errorf("namespace cannot be empty")
+	validate := map[string]string{
+		"namespace":  namespace,
+		"collection": collection,
+		"key":        key,
 	}
-	if collection == "" {
-		return fmt.Errorf("collection cannot be empty")
-	}
-	if key == "" {
-		return fmt.Errorf("key cannot be empty")
+	if err := validateNotEmpty(validate); err != nil {
+		return err
 	}
 
 	cacheKey := fmt.Sprintf("repositories:%s:%s:%s", namespace, collection, key)
@@ -147,8 +173,11 @@ func GetCacheOfRepository[T any](namespace string, collection string, key string
 }
 
 func ClearCacheOfRepository(namespace string) error {
-	if namespace == "" {
-		return fmt.Errorf("namespace cannot be empty")
+	validate := map[string]string{
+		"namespace": namespace,
+	}
+	if err := validateNotEmpty(validate); err != nil {
+		return err
 	}
 
 	prefixKey := fmt.Sprintf("repositories:%s:*", namespace)

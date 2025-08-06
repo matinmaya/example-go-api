@@ -17,7 +17,7 @@ func main() {
 	cf := config.Load(configPath)
 	db, _ := config.DialMysql(cf)
 	redisClient, _ := config.DialRedis(cf)
-	redishelper.InitRedis(redisClient)
+	redishelper.InitRedis(redisClient, cf.Redis.RepoCacheTTL)
 
 	provider.NewProvider(r, db, cf).RegisterServiceProvider().RegisterRouteProvider()
 
