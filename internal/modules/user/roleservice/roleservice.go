@@ -2,6 +2,7 @@ package roleservice
 
 import (
 	"fmt"
+	"log"
 	"reapp/internal/modules/user/rolemodel"
 	"reapp/internal/modules/user/rolerepository"
 	"reapp/pkg/filterscopes"
@@ -33,15 +34,18 @@ func (s *RoleService) Create(db *gorm.DB, role *rolemodel.Role) error {
 	tx := db.Begin()
 	if err := s.repository.Create(tx, role); err != nil {
 		tx.Rollback()
+		log.Printf("%s", err.Error())
 		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
 	}
 
 	if err := s.repository.AddPermissions(tx, role.ID, role.PermissionIds); err != nil {
 		tx.Rollback()
+		log.Printf("%s", err.Error())
 		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
 	}
 
 	if err := tx.Commit().Error; err != nil {
+		log.Printf("%s", err.Error())
 		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
 	}
 
@@ -50,26 +54,31 @@ func (s *RoleService) Create(db *gorm.DB, role *rolemodel.Role) error {
 
 func (s *RoleService) Update(db *gorm.DB, role *rolemodel.Role) error {
 	if _, err := s.repository.GetByID(db, role.ID); err != nil {
+		log.Printf("%s", err.Error())
 		return fmt.Errorf("%s", lang.TranByDB(db, "response", "error"))
 	}
 
 	tx := db.Begin()
 	if err := s.repository.Update(tx, role); err != nil {
 		tx.Rollback()
+		log.Printf("%s", err.Error())
 		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
 	}
 
 	if err := s.repository.RemovePermissions(tx, role.ID); err != nil {
 		tx.Rollback()
+		log.Printf("%s", err.Error())
 		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
 	}
 
 	if err := s.repository.AddPermissions(tx, role.ID, role.PermissionIds); err != nil {
 		tx.Rollback()
+		log.Printf("%s", err.Error())
 		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
 	}
 
 	if err := tx.Commit().Error; err != nil {
+		log.Printf("%s", err.Error())
 		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
 	}
 
@@ -90,11 +99,13 @@ func (s *RoleService) Delete(db *gorm.DB, id uint64) error {
 	}
 
 	if _, err := s.repository.GetByID(db, uint16(id)); err != nil {
+		log.Printf("%s", err.Error())
 		return fmt.Errorf("%s", lang.TranByDB(db, "response", "not_found"))
 	}
 
 	count, err := s.repository.RoleUserCount(db, uint16(id))
 	if err != nil {
+		log.Printf("%s", err.Error())
 		return fmt.Errorf("%s", lang.TranByDB(db, "response", "error"))
 	}
 	if count > 0 {

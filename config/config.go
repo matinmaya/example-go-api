@@ -37,6 +37,10 @@ type Config struct {
 		AccessTokenTTL  int    `yaml:"access_token_ttl"`
 		RefreshTokenTTL int    `yaml:"refresh_token_ttl"`
 	} `yaml:"jwt"`
+
+	Log struct {
+		Filename string `yaml:"file"`
+	} `yaml:"log"`
 }
 
 func Load(path string) *Config {

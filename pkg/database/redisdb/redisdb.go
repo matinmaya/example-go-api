@@ -3,6 +3,7 @@ package redisdb
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"reapp/pkg/helpers/redishelper"
 	"time"
 )
@@ -22,6 +23,7 @@ func GetCacheOfPerms(userID string) ([]string, error) {
 		"userID": userID,
 	}
 	if err := validateNotEmpty(validate); err != nil {
+		log.Printf("%s", err.Error())
 		return nil, err
 	}
 	cacheKey := "permissions:user:" + userID
@@ -36,6 +38,7 @@ func GetCacheOfPerms(userID string) ([]string, error) {
 
 	var permissions []string
 	if err := json.Unmarshal([]byte(cached), &permissions); err != nil {
+		log.Printf("%s", err.Error())
 		return nil, err
 	}
 	return permissions, nil
@@ -46,16 +49,19 @@ func SetCacheOfPerms(userID string, permissions []string) error {
 		"userID": userID,
 	}
 	if err := validateNotEmpty(validate); err != nil {
+		log.Printf("%s", err.Error())
 		return err
 	}
 	cacheKey := "permissions:user:" + userID
 	redisClient := redishelper.Client()
 	data, err := json.Marshal(permissions)
 	if err != nil {
+		log.Printf("%s", err.Error())
 		return err
 	}
 
 	if err := redisClient.Set(cacheKey, data, time.Hour).Err(); err != nil {
+		log.Printf("%s", err.Error())
 		return err
 	}
 	return nil
@@ -66,6 +72,7 @@ func ClearCacheOfPerms() error {
 	iter := redisClient.Scan(0, "permissions:user:*", 0).Iterator()
 	for iter.Next() {
 		if err := redisClient.Del(iter.Val()).Err(); err != nil {
+			log.Printf("%s", err.Error())
 			return err
 		}
 	}
@@ -77,6 +84,7 @@ func GetCacheOfAuthUser[T any](userID string, auth *T) error {
 		"userID": userID,
 	}
 	if err := validateNotEmpty(validate); err != nil {
+		log.Printf("%s", err.Error())
 		return err
 	}
 	cacheKey := "auth:user:" + userID
@@ -87,6 +95,7 @@ func GetCacheOfAuthUser[T any](userID string, auth *T) error {
 	}
 
 	if err := json.Unmarshal([]byte(cached), auth); err != nil {
+		log.Printf("%s", err.Error())
 		return err
 	}
 	return nil
@@ -97,12 +106,14 @@ func SetCacheOfAuthUser[T any](userID string, auth T) error {
 		"userID": userID,
 	}
 	if err := validateNotEmpty(validate); err != nil {
+		log.Printf("%s", err.Error())
 		return err
 	}
 	cacheKey := "auth:user:" + userID
 	redisClient := redishelper.Client()
 	data, err := json.Marshal(auth)
 	if err != nil {
+		log.Printf("%s", err.Error())
 		return err
 	}
 	if err := redisClient.Set(cacheKey, data, 10*time.Minute).Err(); err != nil {
@@ -116,11 +127,13 @@ func RemoveCacheOfAuthUser(userID string) error {
 		"userID": userID,
 	}
 	if err := validateNotEmpty(validate); err != nil {
+		log.Printf("%s", err.Error())
 		return err
 	}
 	cacheKey := "auth:user:" + userID
 	redisClient := redishelper.Client()
 	if err := redisClient.Del(cacheKey).Err(); err != nil {
+		log.Printf("%s", err.Error())
 		return err
 	}
 	return nil
@@ -133,6 +146,7 @@ func SetCacheOfRepository[T any](namespace string, collection string, key string
 		"key":        key,
 	}
 	if err := validateNotEmpty(validate); err != nil {
+		log.Printf("%s", err.Error())
 		return err
 	}
 
@@ -140,10 +154,12 @@ func SetCacheOfRepository[T any](namespace string, collection string, key string
 	redisClient := redishelper.Client()
 	data, err := json.Marshal(params)
 	if err != nil {
+		log.Printf("%s", err.Error())
 		return err
 	}
 
 	if err := redisClient.Set(cacheKey, data, redishelper.GetRepoCacheDuration()).Err(); err != nil {
+		log.Printf("%s", err.Error())
 		return err
 	}
 	return nil
@@ -156,6 +172,7 @@ func GetCacheOfRepository[T any](namespace string, collection string, key string
 		"key":        key,
 	}
 	if err := validateNotEmpty(validate); err != nil {
+		log.Printf("%s", err.Error())
 		return err
 	}
 
@@ -163,6 +180,7 @@ func GetCacheOfRepository[T any](namespace string, collection string, key string
 	redisClient := redishelper.Client()
 	cached, err := redisClient.Get(cacheKey).Result()
 	if err != nil {
+		log.Printf("%s", err.Error())
 		return err
 	}
 
@@ -177,6 +195,7 @@ func ClearCacheOfRepository(namespace string) error {
 		"namespace": namespace,
 	}
 	if err := validateNotEmpty(validate); err != nil {
+		log.Printf("%s", err.Error())
 		return err
 	}
 
@@ -185,6 +204,7 @@ func ClearCacheOfRepository(namespace string) error {
 	iter := redisClient.Scan(0, prefixKey, 0).Iterator()
 	for iter.Next() {
 		if err := redisClient.Del(iter.Val()).Err(); err != nil {
+			log.Printf("%s", err.Error())
 			return err
 		}
 	}

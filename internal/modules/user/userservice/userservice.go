@@ -2,6 +2,7 @@ package userservice
 
 import (
 	"fmt"
+	"log"
 	"reapp/internal/modules/user/usermodel"
 	"reapp/internal/modules/user/userrepository"
 	"reapp/pkg/filterscopes"
@@ -32,6 +33,7 @@ func NewUserService(r *userrepository.UserRepository) IUserService {
 func (s *UserService) Create(db *gorm.DB, user *usermodel.User) error {
 	password, err := hashcrypto.HashMake(user.Password)
 	if err != nil {
+		log.Printf("%s", err.Error())
 		return fmt.Errorf("%s", lang.TranByDB(db, "auth", "failed_has_password"))
 	}
 
@@ -40,15 +42,18 @@ func (s *UserService) Create(db *gorm.DB, user *usermodel.User) error {
 	user.Password = password
 	if err := s.repository.Create(tx, user); err != nil {
 		tx.Rollback()
+		log.Printf("%s", err.Error())
 		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
 	}
 
 	if err := s.repository.AsyncUserRoles(tx, user, roleIds); err != nil {
 		tx.Rollback()
+		log.Printf("%s", err.Error())
 		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
 	}
 
 	if err := tx.Commit().Error; err != nil {
+		log.Printf("%s", err.Error())
 		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
 	}
 
@@ -57,6 +62,7 @@ func (s *UserService) Create(db *gorm.DB, user *usermodel.User) error {
 
 func (s *UserService) Update(db *gorm.DB, user *usermodel.User) error {
 	if _, err := s.repository.GetByID(db, user.ID); err != nil {
+		log.Printf("%s", err.Error())
 		return fmt.Errorf("%s", lang.TranByDB(db, "response", "error"))
 	}
 
@@ -64,15 +70,18 @@ func (s *UserService) Update(db *gorm.DB, user *usermodel.User) error {
 	roleIds := user.RoleIds
 	if err := s.repository.Update(tx, user); err != nil {
 		tx.Rollback()
+		log.Printf("%s", err.Error())
 		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
 	}
 
 	if err := s.repository.AsyncUserRoles(tx, user, roleIds); err != nil {
 		tx.Rollback()
+		log.Printf("%s", err.Error())
 		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
 	}
 
 	if err := tx.Commit().Error; err != nil {
+		log.Printf("%s", err.Error())
 		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
 	}
 
@@ -89,6 +98,7 @@ func (s *UserService) Delete(db *gorm.DB, id uint64) error {
 	}
 
 	if _, err := s.repository.GetByID(db, uint32(id)); err != nil {
+		log.Printf("%s", err.Error())
 		return fmt.Errorf("%s", lang.TranByDB(db, "response", "not_found"))
 	}
 
@@ -102,11 +112,13 @@ func (s *UserService) List(db *gorm.DB, pg *paginator.Pagination, filters []filt
 func (s *UserService) ChangePassword(db *gorm.DB, data usermodel.ChangePassword) error {
 	user, err := s.repository.GetByID(db, data.UserID)
 	if err != nil {
+		log.Printf("%s", err.Error())
 		return fmt.Errorf("%s", lang.TranByDB(db, "response", "error"))
 	}
 
 	password, err := hashcrypto.HashMake(data.NewPassword)
 	if err != nil {
+		log.Printf("%s", err.Error())
 		return fmt.Errorf("%s", lang.TranByDB(db, "auth", "failed_has_password"))
 	}
 	user.Password = password

@@ -2,6 +2,7 @@ package authservice
 
 import (
 	"fmt"
+	"log"
 	"reapp/internal/modules/user/usermodel"
 	"reapp/internal/modules/user/userrepository"
 	"reapp/pkg/hashcrypto"
@@ -33,6 +34,7 @@ func NewAuthService(r *userrepository.UserRepository) IAuthService {
 func (s *AuthService) GetUserByID(db *gorm.DB, id uint32) (*usermodel.User, error) {
 	user, err := s.repository.GetByID(db, id)
 	if err != nil {
+		log.Printf("%s", err.Error())
 		return nil, fmt.Errorf("%s", lang.TranByDB(db, "response", "not_found"))
 	}
 	return user, nil
@@ -41,6 +43,7 @@ func (s *AuthService) GetUserByID(db *gorm.DB, id uint32) (*usermodel.User, erro
 func (s *AuthService) Attempt(db *gorm.DB, cdt usermodel.AuthCredentials) (*usermodel.User, error) {
 	user, err := s.repository.GetByUsername(db, cdt.Username)
 	if err != nil {
+		log.Printf("%s", err.Error())
 		return nil, fmt.Errorf("%s", lang.TranByDB(db, "auth", "invalid_credentials"))
 	}
 
