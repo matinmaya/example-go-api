@@ -2,9 +2,9 @@ package userrepository
 
 import (
 	"reapp/internal/modules/user/usermodel"
-	"reapp/pkg/database/redisdb"
-	"reapp/pkg/filterscopes"
 	"reapp/pkg/paginator"
+	"reapp/pkg/queryfilter"
+	"reapp/pkg/services/rediservice"
 
 	"gorm.io/gorm"
 )
@@ -18,17 +18,17 @@ func NewUserRepository() *UserRepository {
 }
 
 func (r *UserRepository) Create(db *gorm.DB, user *usermodel.User) error {
-	go redisdb.ClearCacheOfRepository(r.namespace)
+	go rediservice.ClearCacheOfRepository(r.namespace)
 	return db.Create(user).Error
 }
 
 func (r *UserRepository) Update(db *gorm.DB, user *usermodel.User) error {
-	go redisdb.ClearCacheOfRepository(r.namespace)
+	go rediservice.ClearCacheOfRepository(r.namespace)
 	return db.Save(user).Error
 }
 
 func (r *UserRepository) Delete(db *gorm.DB, id uint32) error {
-	go redisdb.ClearCacheOfRepository(r.namespace)
+	go rediservice.ClearCacheOfRepository(r.namespace)
 	return db.Delete(&usermodel.User{}, id).Error
 }
 
@@ -39,18 +39,18 @@ func (UserRepository) GetByID(db *gorm.DB, id uint32) (*usermodel.User, error) {
 	return &user, err
 }
 
-func (r *UserRepository) List(db *gorm.DB, pg *paginator.Pagination, filters []filterscopes.QueryFilter) error {
+func (r *UserRepository) List(db *gorm.DB, pg *paginator.Pagination, filters []queryfilter.QueryFilter) error {
 	var users []usermodel.User
 	scope := paginator.Paginate(db, r.namespace, &usermodel.User{}, pg, filters)
 
 	collectionKey := "list"
-	if err := redisdb.GetCacheOfRepository(r.namespace, collectionKey, pg.GetListCacheKey(), &users); err != nil {
+	if err := rediservice.CacheOfRepository(r.namespace, collectionKey, pg.GetListCacheKey(), &users); err != nil {
 		err := db.Scopes(scope).Find(&users).Error
 		if err != nil {
 			return err
 		}
 
-		redisdb.SetCacheOfRepository(r.namespace, collectionKey, pg.GetListCacheKey(), users)
+		rediservice.SetCacheOfRepository(r.namespace, collectionKey, pg.GetListCacheKey(), users)
 	}
 
 	pg.SetRows(users)

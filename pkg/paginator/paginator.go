@@ -3,24 +3,24 @@ package paginator
 import (
 	"encoding/json"
 	"math"
-	"reapp/pkg/database/redisdb"
-	"reapp/pkg/filterscopes"
-	"reapp/pkg/hashcrypto"
+	"reapp/pkg/crypto"
+	"reapp/pkg/queryfilter"
+	"reapp/pkg/services/rediservice"
 
 	"gorm.io/gorm"
 )
 
 type Pagination struct {
-	Limit         int                        `json:"limit,omitempty" form:"limit"`
-	Page          int                        `json:"page,omitempty" form:"page"`
-	SortBy        string                     `json:"sort_by,omitempty" form:"sort_by"`
-	SortDir       string                     `json:"sort_dir,omitempty" form:"sort_dir"`
-	Total         int                        `json:"total"`
-	TotalPage     int                        `json:"total_page"`
-	Filters       []filterscopes.QueryFilter `json:"-"`
-	ListCacheKey  string                     `json:"-"`
-	CountCacheKey string                     `json:"-"`
-	Rows          interface{}                `json:"data"`
+	Limit         int                       `json:"limit,omitempty" form:"limit"`
+	Page          int                       `json:"page,omitempty" form:"page"`
+	SortBy        string                    `json:"sort_by,omitempty" form:"sort_by"`
+	SortDir       string                    `json:"sort_dir,omitempty" form:"sort_dir"`
+	Total         int                       `json:"total"`
+	TotalPage     int                       `json:"total_page"`
+	Filters       []queryfilter.QueryFilter `json:"-"`
+	ListCacheKey  string                    `json:"-"`
+	CountCacheKey string                    `json:"-"`
+	Rows          interface{}               `json:"data"`
 }
 
 func (p *Pagination) GetOffset() int {
@@ -57,18 +57,18 @@ func (p *Pagination) SetRows(rows interface{}) {
 	p.Rows = rows
 }
 
-func Paginate(db *gorm.DB, repositoryNamespace string, dbModel interface{}, pg *Pagination, filters []filterscopes.QueryFilter) func(db *gorm.DB) *gorm.DB {
+func Paginate(db *gorm.DB, repositoryNamespace string, dbModel interface{}, pg *Pagination, filters []queryfilter.QueryFilter) func(db *gorm.DB) *gorm.DB {
 	var total int64
 	if pg.Page < 1 {
 		pg.Page = 1
 	}
 
 	collectionKey := "count"
-	if err := redisdb.GetCacheOfRepository(repositoryNamespace, collectionKey, pg.GetCountCacheKey(), &total); err != nil {
-		filteredDB := filterscopes.QueryFilterScopes(db.Model(dbModel), filters)
+	if err := rediservice.CacheOfRepository(repositoryNamespace, collectionKey, pg.GetCountCacheKey(), &total); err != nil {
+		filteredDB := queryfilter.QueryFilterScopes(db.Model(dbModel), filters)
 		filteredDB.Count(&total)
 
-		redisdb.SetCacheOfRepository(repositoryNamespace, collectionKey, pg.GetCountCacheKey(), total)
+		rediservice.SetCacheOfRepository(repositoryNamespace, collectionKey, pg.GetCountCacheKey(), total)
 	}
 
 	pg.Total = int(total)
@@ -76,7 +76,7 @@ func Paginate(db *gorm.DB, repositoryNamespace string, dbModel interface{}, pg *
 
 	return func(db *gorm.DB) *gorm.DB {
 		offset := pg.GetOffset()
-		return filterscopes.QueryFilterScopes(db, filters).Offset(offset).Limit(pg.GetLimit()).Order(pg.GetSort())
+		return queryfilter.QueryFilterScopes(db, filters).Offset(offset).Limit(pg.GetLimit()).Order(pg.GetSort())
 	}
 }
 
@@ -99,7 +99,7 @@ func (p *Pagination) GenerateListKey() (string, error) {
 		return "", err
 	}
 
-	return hashcrypto.HashCacheKey(string(keys)), nil
+	return crypto.CacheKey(string(keys)), nil
 }
 
 func (p *Pagination) GenerateCountKey() (string, error) {
@@ -108,7 +108,7 @@ func (p *Pagination) GenerateCountKey() (string, error) {
 		return "", err
 	}
 
-	return hashcrypto.HashCacheKey(string(bFilter)), nil
+	return crypto.CacheKey(string(bFilter)), nil
 }
 
 func (p *Pagination) GetListCacheKey() string {

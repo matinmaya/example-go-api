@@ -7,7 +7,7 @@ import (
 
 type TFields map[string]any
 
-func GetFieldsOfDTO(modelDTO any, fieldNames []string) TFields {
+func FieldsOfDTO(modelDTO any, fieldNames []string) TFields {
 	dtoValue := reflect.Indirect(reflect.ValueOf(modelDTO))
 	dtoType := dtoValue.Type()
 
@@ -28,7 +28,7 @@ func GetFieldsOfDTO(modelDTO any, fieldNames []string) TFields {
 	return fields
 }
 
-func AssignFieldValuesToModel(model any, fields TFields) error {
+func SetModelFields(model any, fields TFields) error {
 	modelValue := reflect.ValueOf(model)
 	if modelValue.Kind() == reflect.Ptr {
 		modelValue = modelValue.Elem()
@@ -54,7 +54,7 @@ func AssignFieldValuesToModel(model any, fields TFields) error {
 	return nil
 }
 
-func AssignModelValues[T any](model *T, modelDTO any, fieldNames []string) error {
-	fields := GetFieldsOfDTO(modelDTO, fieldNames)
-	return AssignFieldValuesToModel(model, fields)
+func MapDTOToModel[T any](model *T, modelDTO any, fieldNames []string) error {
+	fields := FieldsOfDTO(modelDTO, fieldNames)
+	return SetModelFields(model, fields)
 }

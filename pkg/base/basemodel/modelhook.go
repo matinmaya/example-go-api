@@ -3,7 +3,7 @@ package basemodel
 import (
 	"encoding/json"
 	"fmt"
-	"reapp/pkg/authctx"
+	"reapp/pkg/context/authctx"
 	"reflect"
 	"strconv"
 
@@ -169,7 +169,7 @@ func AddLogData(tx *gorm.DB, tbName, tbIDStr, action string, changes any, fullMo
 		}
 	}
 
-	log := SysLog{
+	log := TableLog{
 		TbName:      tbName,
 		TbID:        tbID,
 		Action:      action,
@@ -199,5 +199,5 @@ func ToColumnName(fieldname string) string {
 }
 
 func GetUserID(tx *gorm.DB) *uint32 {
-	return authctx.GetUserID(tx.Statement.Context)
+	return authctx.UserID(tx.Statement.Context)
 }

@@ -5,10 +5,8 @@ import (
 	"log"
 	"reapp/internal/modules/user/usermodel"
 	"reapp/internal/modules/user/userrepository"
-	"reapp/pkg/hashcrypto"
-	"reapp/pkg/helpers/redishelper"
+	"reapp/pkg/crypto"
 	"reapp/pkg/lang"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -20,7 +18,6 @@ type IAuthService interface {
 	GetTokenInfo(db *gorm.DB, userID uint32, jti string) (*usermodel.TokenInfo, error)
 	UpdateTokenInfo(db *gorm.DB, tokenInfo *usermodel.TokenInfo) error
 	DeleteTokenInfo(db *gorm.DB, userID uint32, jti string) error
-	RevokeAccessToken(jti string, expiresAt time.Time) error
 }
 
 type AuthService struct {
@@ -47,7 +44,7 @@ func (s *AuthService) Attempt(db *gorm.DB, cdt usermodel.AuthCredentials) (*user
 		return nil, fmt.Errorf("%s", lang.TranByDB(db, "auth", "invalid_credentials"))
 	}
 
-	if !hashcrypto.HashCheck(cdt.Password, user.Password) {
+	if !crypto.Check(cdt.Password, user.Password) {
 		return nil, fmt.Errorf("%s", lang.TranByDB(db, "auth", "invalid_credentials"))
 	}
 
@@ -68,10 +65,4 @@ func (s *AuthService) UpdateTokenInfo(db *gorm.DB, tokenInfo *usermodel.TokenInf
 
 func (s *AuthService) DeleteTokenInfo(db *gorm.DB, userID uint32, jti string) error {
 	return s.repository.DeleteTokenInfo(db, userID, jti)
-}
-
-func (s *AuthService) RevokeAccessToken(jti string, expiresAt time.Time) error {
-	client := redishelper.Client()
-	key := "revoked:" + jti
-	return client.Set(key, "true", time.Until(expiresAt)).Err()
 }

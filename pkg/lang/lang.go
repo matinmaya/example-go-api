@@ -2,7 +2,7 @@ package lang
 
 import (
 	"fmt"
-	"reapp/pkg/helpers/ctxhelper"
+	"reapp/pkg/context/dbctx"
 	langdata "reapp/pkg/lang/data"
 
 	"github.com/gin-gonic/gin"
@@ -39,7 +39,7 @@ func Tran(ctx *gin.Context, group, key string) string {
 }
 
 func TranByDB(db *gorm.DB, group, key string) string {
-	lang := ctxhelper.GetLangByDBContext(db)
+	lang := dbctx.LangByDBContext(db)
 	return Get(lang, group, key)
 }
 

@@ -2,14 +2,14 @@ package provider
 
 import (
 	"reapp/config"
-	"reapp/internal/middleware/dbmdw"
-	"reapp/internal/middleware/langmdw"
-	"reapp/internal/middleware/loggermdw"
+	"reapp/internal/middleware/dbmw"
+	"reapp/internal/middleware/langmw"
+	"reapp/internal/middleware/logmw"
 	"reapp/internal/modules/user/usermigration"
 	"reapp/internal/router"
 	"reapp/pkg/base/basemodel"
-	"reapp/pkg/helpers/jwthelper"
-	"reapp/pkg/register"
+	"reapp/pkg/http/register"
+	"reapp/pkg/services/jwtservice"
 	"reapp/pkg/validators"
 
 	"github.com/gin-gonic/gin"
@@ -32,13 +32,13 @@ func NewProvider(r *gin.Engine, db *gorm.DB, cf *config.Config) *Provider {
 }
 
 func (p *Provider) RegisterServiceProvider() *Provider {
-	jwthelper.InitJWT(
+	jwtservice.InitJWT(
 		p.cf.JWT.Secret,
 		p.cf.JWT.AccessTokenTTL,
 		p.cf.JWT.RefreshTokenTTL,
 	)
 
-	p.db.AutoMigrate(&basemodel.SysLog{}, &basemodel.RequestLog{})
+	p.db.AutoMigrate(&basemodel.TableLog{}, &basemodel.HttpLog{})
 	usermigration.Migrate(p.db)
 
 	vlt := validators.InitValidation(p.db, validator.New())
@@ -48,11 +48,11 @@ func (p *Provider) RegisterServiceProvider() *Provider {
 }
 
 func (p *Provider) RegisterRouteProvider() *Provider {
-	p.r.Use(loggermdw.RequestLogger(p.db))
-	p.r.Use(langmdw.Language())
-	p.r.Use(dbmdw.WithDBContext(p.db))
+	p.r.Use(logmw.HttpLogger(p.db))
+	p.r.Use(langmw.Language())
+	p.r.Use(dbmw.WithDBContext(p.db))
 
 	router.NewRouter(p.r, p.db).UseAdminRouter().UseFrontendRouter().UseNotFoundRouter()
-	register.InjectRoutes(p.r.Group("/"))
+	register.UseRoutes(p.r.Group("/"))
 	return p
 }

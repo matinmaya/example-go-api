@@ -43,7 +43,7 @@ example-go-api/
 │   ├── paginator/          # Pagination logic and helpers
 │   ├── response/           # Standard API response wrapper
 │   ├── validators/         # Reusable validation logic
-│   └── requestutils/       # Field reflection utilities
+│   └── reqctx/       # Field reflection utilities
 ├── go.mod
 ├── go.sum
 └── README.md

@@ -5,8 +5,8 @@ import (
 	"reapp/internal/modules/user/authroute"
 	"reapp/internal/modules/user/roleroute"
 	"reapp/internal/modules/user/userroute"
+	"reapp/pkg/http/response"
 	"reapp/pkg/lang"
-	"reapp/pkg/response"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"

@@ -1,11 +1,11 @@
 package authroute
 
 import (
-	"reapp/internal/middleware/authmdw"
+	"reapp/internal/middleware/authmw"
 	"reapp/internal/modules/user/authhandler"
 	"reapp/internal/modules/user/authservice"
 	"reapp/internal/modules/user/userrepository"
-	"reapp/pkg/register"
+	"reapp/pkg/http/register"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,18 +13,14 @@ import (
 type AuthRoute struct{}
 
 func UseAuthRoute() {
-	register.ProvideRoute(&AuthRoute{})
+	register.AddRoute(&AuthRoute{})
 }
 
 func (AuthRoute) RegisterRoute(rg *gin.RouterGroup) {
 	r := rg.Group("auth")
 	h := authhandler.NewAuthHandler(authservice.NewAuthService(userrepository.NewUserRepository()))
 
-	// Public routes
 	r.POST("/login", h.Login)
-
-	// Protected routes
-	r.Use(authmdw.AuthRequired())
-	r.POST("/refresh", h.Refresh)
-	r.POST("/logout", h.Logout)
+	r.POST("/logout", authmw.AuthRequired(), h.Logout)
+	r.POST("/refresh", authmw.RefreshToken(), h.Refresh)
 }

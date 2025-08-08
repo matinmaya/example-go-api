@@ -2,14 +2,14 @@ package basehandler
 
 import (
 	"net/http"
-	"reapp/pkg/binding"
-	"reapp/pkg/filterscopes"
-	"reapp/pkg/helpers/ctxhelper"
+	"reapp/pkg/context/dbctx"
+	"reapp/pkg/http/reqctx"
+	"reapp/pkg/http/reqvalidate"
+	"reapp/pkg/http/response"
 	"reapp/pkg/lang"
 	"reapp/pkg/mapper"
 	"reapp/pkg/paginator"
-	"reapp/pkg/requestutils"
-	"reapp/pkg/response"
+	"reapp/pkg/queryfilter"
 	"reflect"
 
 	"github.com/gin-gonic/gin"
@@ -21,7 +21,7 @@ type TScopeWithIDFunc[T any] func(*T, uint64) error
 type TRemoveFieldsFunc func(*[]string) error
 
 type IServiceLister interface {
-	List(db *gorm.DB, pagination *paginator.Pagination, filters []filterscopes.QueryFilter) error
+	List(db *gorm.DB, pagination *paginator.Pagination, filters []queryfilter.QueryFilter) error
 }
 
 type IServiceGetter[T any] interface {
@@ -46,7 +46,7 @@ type IServiceDeleter interface {
 }
 
 func Paginate(ctx *gin.Context, service IServiceLister, query any) {
-	db := ctxhelper.GetDB(ctx)
+	db := dbctx.DB(ctx)
 	var pagination paginator.Pagination
 
 	valueOfQuery := reflect.ValueOf(query)
@@ -66,7 +66,7 @@ func Paginate(ctx *gin.Context, service IServiceLister, query any) {
 	}
 
 	queryValues := ctx.Request.URL.Query()
-	filters := filterscopes.ParseQueryByUrlValues(query, queryValues)
+	filters := queryfilter.ParseQueryByUrlValues(query, queryValues)
 
 	if err := service.List(db, &pagination, filters); err != nil {
 		response.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
@@ -77,7 +77,7 @@ func Paginate(ctx *gin.Context, service IServiceLister, query any) {
 }
 
 func GetAll[T any](ctx *gin.Context, service IServiceGetter[T]) {
-	db := ctxhelper.GetDB(ctx)
+	db := dbctx.DB(ctx)
 
 	data, err := service.GetAll(db)
 	if err != nil {
@@ -89,9 +89,9 @@ func GetAll[T any](ctx *gin.Context, service IServiceGetter[T]) {
 }
 
 func GetDetail[T any](ctx *gin.Context, service IServiceGetterDetail[T]) {
-	db := ctxhelper.GetDB(ctx)
+	db := dbctx.DB(ctx)
 	var id uint64
-	if !binding.ValidateParamID(ctx, &id) {
+	if !reqvalidate.ValidateParamID(ctx, &id) {
 		return
 	}
 
@@ -112,8 +112,8 @@ func Create[T1 any, T2 any](
 	setValidationScope TScopeFunc[T2],
 	formatResponse func(model *T1) error,
 ) {
-	db := ctxhelper.GetDB(ctx)
-	fields, bad := requestutils.GetFieldNames(ctx)
+	db := dbctx.DB(ctx)
+	fields, bad := reqctx.GetFieldNames(ctx)
 	if bad != nil {
 		response.Error(ctx, http.StatusBadRequest, bad.Error(), nil)
 		return
@@ -126,11 +126,11 @@ func Create[T1 any, T2 any](
 		}
 	}
 
-	if !binding.ValidateData(ctx, modelDTO) {
+	if !reqvalidate.Validate(ctx, modelDTO) {
 		return
 	}
 
-	if err := mapper.AssignModelValues(model, modelDTO, fields); err != nil {
+	if err := mapper.MapDTOToModel(model, modelDTO, fields); err != nil {
 		response.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
@@ -159,13 +159,13 @@ func Update[T1 any, T2 any](
 	removeFields TRemoveFieldsFunc,
 	formatResponse func(model *T1) error,
 ) {
-	db := ctxhelper.GetDB(ctx)
+	db := dbctx.DB(ctx)
 	var id uint64
-	if !binding.ValidateParamID(ctx, &id) {
+	if !reqvalidate.ValidateParamID(ctx, &id) {
 		return
 	}
 
-	fields, bad := requestutils.GetFieldNames(ctx)
+	fields, bad := reqctx.GetFieldNames(ctx)
 	if bad != nil {
 		response.Error(ctx, http.StatusBadRequest, bad.Error(), nil)
 		return
@@ -183,7 +183,7 @@ func Update[T1 any, T2 any](
 			return
 		}
 	}
-	if !binding.ValidateData(ctx, modelDTO) {
+	if !reqvalidate.Validate(ctx, modelDTO) {
 		return
 	}
 
@@ -194,7 +194,7 @@ func Update[T1 any, T2 any](
 		}
 	}
 
-	if err := mapper.AssignModelValues(model, modelDTO, fields); err != nil {
+	if err := mapper.MapDTOToModel(model, modelDTO, fields); err != nil {
 		response.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
@@ -215,9 +215,9 @@ func Update[T1 any, T2 any](
 }
 
 func Delete(ctx *gin.Context, service IServiceDeleter, beforeResponse func(*gin.Context) error) {
-	db := ctxhelper.GetDB(ctx)
+	db := dbctx.DB(ctx)
 	var id uint64
-	if !binding.ValidateParamID(ctx, &id) {
+	if !reqvalidate.ValidateParamID(ctx, &id) {
 		return
 	}
 

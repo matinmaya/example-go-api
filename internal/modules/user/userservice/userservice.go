@@ -5,10 +5,10 @@ import (
 	"log"
 	"reapp/internal/modules/user/usermodel"
 	"reapp/internal/modules/user/userrepository"
-	"reapp/pkg/filterscopes"
-	"reapp/pkg/hashcrypto"
+	"reapp/pkg/crypto"
 	"reapp/pkg/lang"
 	"reapp/pkg/paginator"
+	"reapp/pkg/queryfilter"
 
 	"gorm.io/gorm"
 )
@@ -18,7 +18,7 @@ type IUserService interface {
 	Update(db *gorm.DB, user *usermodel.User) error
 	GetByID(db *gorm.DB, id uint64) (*usermodel.User, error)
 	Delete(db *gorm.DB, id uint64) error
-	List(db *gorm.DB, pg *paginator.Pagination, filters []filterscopes.QueryFilter) error
+	List(db *gorm.DB, pg *paginator.Pagination, filters []queryfilter.QueryFilter) error
 	ChangePassword(db *gorm.DB, data usermodel.ChangePassword) error
 }
 
@@ -31,7 +31,7 @@ func NewUserService(r *userrepository.UserRepository) IUserService {
 }
 
 func (s *UserService) Create(db *gorm.DB, user *usermodel.User) error {
-	password, err := hashcrypto.HashMake(user.Password)
+	password, err := crypto.Make(user.Password)
 	if err != nil {
 		log.Printf("%s", err.Error())
 		return fmt.Errorf("%s", lang.TranByDB(db, "auth", "failed_has_password"))
@@ -105,7 +105,7 @@ func (s *UserService) Delete(db *gorm.DB, id uint64) error {
 	return s.repository.Delete(db, uint32(id))
 }
 
-func (s *UserService) List(db *gorm.DB, pg *paginator.Pagination, filters []filterscopes.QueryFilter) error {
+func (s *UserService) List(db *gorm.DB, pg *paginator.Pagination, filters []queryfilter.QueryFilter) error {
 	return s.repository.List(db, pg, filters)
 }
 
@@ -116,7 +116,7 @@ func (s *UserService) ChangePassword(db *gorm.DB, data usermodel.ChangePassword)
 		return fmt.Errorf("%s", lang.TranByDB(db, "response", "error"))
 	}
 
-	password, err := hashcrypto.HashMake(data.NewPassword)
+	password, err := crypto.Make(data.NewPassword)
 	if err != nil {
 		log.Printf("%s", err.Error())
 		return fmt.Errorf("%s", lang.TranByDB(db, "auth", "failed_has_password"))

@@ -4,7 +4,7 @@ import (
 	"reapp/internal/modules/user/permmodel"
 	"reapp/internal/modules/user/rolemodel"
 	"reapp/internal/modules/user/usermodel"
-	"reapp/pkg/hashcrypto"
+	"reapp/pkg/crypto"
 
 	"gorm.io/gorm"
 )
@@ -48,7 +48,7 @@ func Run(db *gorm.DB) error {
 		db.FirstOrCreate(&rp, "role_id = ? AND permission_id = ?", rp.RoleID, rp.PermissionID)
 	}
 
-	psw, err := hashcrypto.HashMake("admin123")
+	psw, err := crypto.Make("admin123")
 	if err != nil {
 		return nil
 	}

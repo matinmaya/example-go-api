@@ -5,9 +5,9 @@ import (
 	"log"
 	"reapp/internal/modules/user/rolemodel"
 	"reapp/internal/modules/user/rolerepository"
-	"reapp/pkg/filterscopes"
 	"reapp/pkg/lang"
 	"reapp/pkg/paginator"
+	"reapp/pkg/queryfilter"
 
 	"gorm.io/gorm"
 )
@@ -18,7 +18,7 @@ type IRoleService interface {
 	GetByID(db *gorm.DB, id uint64) (*rolemodel.Role, error)
 	GetDetail(db *gorm.DB, id uint64) (*rolemodel.Role, error)
 	Delete(db *gorm.DB, id uint64) error
-	List(db *gorm.DB, pg *paginator.Pagination, filters []filterscopes.QueryFilter) error
+	List(db *gorm.DB, pg *paginator.Pagination, filters []queryfilter.QueryFilter) error
 	GetAll(db *gorm.DB) ([]rolemodel.Role, error)
 }
 
@@ -119,6 +119,6 @@ func (s *RoleService) GetAll(db *gorm.DB) ([]rolemodel.Role, error) {
 	return s.repository.GetAll(db)
 }
 
-func (s *RoleService) List(db *gorm.DB, pg *paginator.Pagination, filters []filterscopes.QueryFilter) error {
+func (s *RoleService) List(db *gorm.DB, pg *paginator.Pagination, filters []queryfilter.QueryFilter) error {
 	return s.repository.List(db, pg, filters)
 }

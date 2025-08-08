@@ -5,11 +5,11 @@ import (
 	"reapp/internal/modules/user/usermodel"
 	"reapp/internal/modules/user/userservice"
 	"reapp/pkg/base/basehandler"
-	"reapp/pkg/binding"
-	"reapp/pkg/database/redisdb"
-	"reapp/pkg/helpers/ctxhelper"
-	"reapp/pkg/requestutils"
-	"reapp/pkg/response"
+	"reapp/pkg/context/dbctx"
+	"reapp/pkg/http/reqctx"
+	"reapp/pkg/http/reqvalidate"
+	"reapp/pkg/http/response"
+	"reapp/pkg/services/rediservice"
 	"reapp/pkg/validators"
 
 	"github.com/gin-gonic/gin"
@@ -39,11 +39,11 @@ func (h *UserHandler) Update(ctx *gin.Context) {
 		user.UniqueScope = validators.ExceptByID(id)
 		return nil
 	}, func(fields *[]string) error {
-		requestutils.RemoveFields(fields, "Password")
+		reqctx.RemoveFields(fields, "Password")
 		return nil
 	}, func(user *usermodel.User) error {
 		user.RoleIds = []uint16{}
-		go redisdb.RemoveCacheOfAuthUser(fmt.Sprintf("%v", user.ID))
+		go rediservice.RemoveCacheOfAuthUser(fmt.Sprintf("%v", user.ID))
 		return nil
 	})
 }
@@ -51,15 +51,15 @@ func (h *UserHandler) Update(ctx *gin.Context) {
 func (h *UserHandler) Delete(ctx *gin.Context) {
 	basehandler.Delete(ctx, h.service, func(ctx *gin.Context) error {
 		userID, _ := ctx.Get("user_id")
-		go redisdb.RemoveCacheOfAuthUser(fmt.Sprintf("%v", userID))
+		go rediservice.RemoveCacheOfAuthUser(fmt.Sprintf("%v", userID))
 		return nil
 	})
 }
 
 func (h *UserHandler) ChangePassword(ctx *gin.Context) {
-	db := ctxhelper.GetDB(ctx)
+	db := dbctx.DB(ctx)
 	var data usermodel.ChangePassword
-	if !binding.ValidateData(ctx, &data) {
+	if !reqvalidate.Validate(ctx, &data) {
 		return
 	}
 

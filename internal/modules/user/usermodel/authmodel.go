@@ -35,7 +35,8 @@ type AuthCredentials struct {
 }
 
 type AuthLoginResource struct {
-	Username     string `json:"username"`
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
+	Username     string                   `json:"username"`
+	AccessToken  string                   `json:"access_token"`
+	RefreshToken string                   `json:"refresh_token"`
+	ExpiresAt    basemodel.DateTimeFormat `json:"expires_at"`
 }

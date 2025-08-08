@@ -8,7 +8,7 @@ import (
 	"github.com/go-playground/validator"
 )
 
-func GetMessage(ctx *gin.Context, fe validator.FieldError) string {
+func Message(ctx *gin.Context, fe validator.FieldError) string {
 	switch fe.Tag() {
 	case "required":
 		return lang.Tran(ctx, "validation", "required")
