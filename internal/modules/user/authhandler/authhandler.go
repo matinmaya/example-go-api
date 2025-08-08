@@ -95,7 +95,7 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 func (h *AuthHandler) Refresh(ctx *gin.Context) {
 	db := dbctx.DB(ctx)
 	var req struct {
-		RefreshToken string `json:"refresh_token" binding:"required"`
+		RefreshToken string `json:"refresh_token" validate:"required"`
 	}
 	if !reqvalidate.Validate(ctx, &req) {
 		return
