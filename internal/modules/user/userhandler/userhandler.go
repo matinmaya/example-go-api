@@ -28,7 +28,7 @@ func (h *UserHandler) List(ctx *gin.Context) {
 }
 
 func (h *UserHandler) Create(ctx *gin.Context) {
-	basehandler.Create(ctx, h.service, &usermodel.User{}, &usermodel.User{}, nil, func(user *usermodel.User) error {
+	basehandler.Create(ctx, h.service, &usermodel.User{}, &usermodel.User{}, nil, func(ctx *gin.Context, user *usermodel.User) error {
 		user.RoleIds = []uint16{}
 		return nil
 	})
@@ -41,7 +41,7 @@ func (h *UserHandler) Update(ctx *gin.Context) {
 	}, func(fields *[]string) error {
 		reqctx.RemoveFields(fields, "Password")
 		return nil
-	}, func(user *usermodel.User) error {
+	}, func(ctx *gin.Context, user *usermodel.User) error {
 		user.RoleIds = []uint16{}
 		go rediservice.RemoveCacheOfAuthUser(fmt.Sprintf("%v", user.ID))
 		return nil

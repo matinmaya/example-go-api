@@ -9,3 +9,6 @@ release:
 
 seed:
 	go run cmd/seeder/seeder.go
+
+ptg:
+	git add . && git commit -m "$(comment)" && git push

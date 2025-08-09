@@ -38,7 +38,7 @@ func (h *RoleHandler) Update(ctx *gin.Context) {
 	basehandler.Update(ctx, h.service, &rolemodel.Role{}, func(role *rolemodel.Role, id uint64) error {
 		role.UniqueScope = validators.ExceptByID(id)
 		return nil
-	}, nil, func(role *rolemodel.Role) error {
+	}, nil, func(ctx *gin.Context, role *rolemodel.Role) error {
 		role.PermissionIds = []uint32{}
 		go rediservice.ClearCacheOfPerms()
 		return nil

@@ -19,6 +19,7 @@ import (
 type TScopeFunc[T any] func(*T) error
 type TScopeWithIDFunc[T any] func(*T, uint64) error
 type TRemoveFieldsFunc func(*[]string) error
+type TBeforeResponseFunc[T any] func(ctx *gin.Context, model *T) error
 
 type IServiceLister interface {
 	List(db *gorm.DB, pagination *paginator.Pagination, filters []queryfilter.QueryFilter) error
@@ -110,7 +111,7 @@ func Create[T1 any, T2 any](
 	model *T1,
 	modelDTO *T2,
 	setValidationScope TScopeFunc[T2],
-	formatResponse func(model *T1) error,
+	beforeResponse TBeforeResponseFunc[T1],
 ) {
 	db := dbctx.DB(ctx)
 	fields, bad := reqctx.GetFieldNames(ctx)
@@ -141,8 +142,8 @@ func Create[T1 any, T2 any](
 		return
 	}
 
-	if formatResponse != nil {
-		if err := formatResponse(model); err != nil {
+	if beforeResponse != nil {
+		if err := beforeResponse(ctx, model); err != nil {
 			response.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 			return
 		}
@@ -157,7 +158,7 @@ func Update[T1 any, T2 any](
 	modelDTO *T2,
 	setValidationScope TScopeWithIDFunc[T2],
 	removeFields TRemoveFieldsFunc,
-	formatResponse func(model *T1) error,
+	beforeResponse TBeforeResponseFunc[T1],
 ) {
 	db := dbctx.DB(ctx)
 	var id uint64
@@ -205,8 +206,8 @@ func Update[T1 any, T2 any](
 		return
 	}
 
-	if formatResponse != nil {
-		if err := formatResponse(model); err != nil {
+	if beforeResponse != nil {
+		if err := beforeResponse(ctx, model); err != nil {
 			response.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 			return
 		}
