@@ -41,6 +41,24 @@ type Config struct {
 	Log struct {
 		Filename string `yaml:"file"`
 	} `yaml:"log"`
+
+	Storage struct {
+		Provider string `yaml:"provider"`
+
+		Local struct {
+			BasePath  string `yaml:"base_path"`
+			MaxSizeMB int    `yaml:"max_size_mb"`
+		} `yaml:"local"`
+
+		S3 struct {
+			Bucket    string `yaml:"bucket"`
+			Region    string `yaml:"region"`
+			AccessKey string `yaml:"access_key"`
+			SecretKey string `yaml:"secret_key"`
+			Endpoint  string `yaml:"endpoint"`
+			MaxSizeMB int    `yaml:"max_size_mb"`
+		} `yaml:"s3"`
+	} `yaml:"storage"`
 }
 
 func Load(path string) *Config {

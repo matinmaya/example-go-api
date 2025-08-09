@@ -58,3 +58,6 @@ gin-bin/
 
 # Debug symbols (Delve)
 *.dSYM
+
+# Local file storage
+/storages/uploads/*
