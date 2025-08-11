@@ -11,6 +11,7 @@ type User struct {
 	Username string           `json:"username" gorm:"unique;not null;type:varchar(50);" validate:"required,min=6,max=50,unique=sys_users?id"`
 	Password string           `json:"-" gorm:"not null;type:varchar(120);"`
 	Status   bool             `json:"status" gorm:"not null;default=false;"`
+	Img      string           `json:"img" gorm:"type:varchar(255);"`
 	Roles    []rolemodel.Role `json:"roles,omitempty" gorm:"many2many:sys_user_role;"`
 	RoleIds  []uint16         `json:"role_ids,omitempty" gorm:"-" validate:"required"`
 	basemodel.SoftFields

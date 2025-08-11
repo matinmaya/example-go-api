@@ -1,12 +1,14 @@
 package userrepository
 
 import (
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+
 	"reapp/internal/modules/user/usermodel"
+	"reapp/pkg/bucket"
 	"reapp/pkg/paginator"
 	"reapp/pkg/queryfilter"
 	"reapp/pkg/services/rediservice"
-
-	"gorm.io/gorm"
 )
 
 type UserRepository struct {
@@ -39,7 +41,7 @@ func (UserRepository) GetByID(db *gorm.DB, id uint32) (*usermodel.User, error) {
 	return &user, err
 }
 
-func (r *UserRepository) List(db *gorm.DB, pg *paginator.Pagination, filters []queryfilter.QueryFilter) error {
+func (r *UserRepository) List(ctx *gin.Context, db *gorm.DB, pg *paginator.Pagination, filters []queryfilter.QueryFilter) error {
 	var users []usermodel.User
 	scope := paginator.Paginate(db, r.namespace, &usermodel.User{}, pg, filters)
 
@@ -53,6 +55,11 @@ func (r *UserRepository) List(db *gorm.DB, pg *paginator.Pagination, filters []q
 		rediservice.SetCacheOfRepository(r.namespace, collectionKey, pg.GetListCacheKey(), users)
 	}
 
+	for i := range users {
+		if users[i].Img != "" {
+			users[i].Img = bucket.GetFullImageURL(ctx, users[i].Img)
+		}
+	}
 	pg.SetRows(users)
 	return nil
 }

@@ -60,4 +60,5 @@ gin-bin/
 *.dSYM
 
 # Local file storage
+/storages/cache/*
 /storages/uploads/*

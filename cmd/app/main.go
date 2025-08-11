@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
+
+	"github.com/gin-gonic/gin"
+
 	"reapp/config"
 	"reapp/internal/provider"
 	"reapp/pkg/logger"
 	"reapp/pkg/redisclient"
-
-	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -21,7 +22,7 @@ func main() {
 	redisClient, _ := config.DialRedis(cf)
 	redisclient.InitRedis(redisClient, cf.Redis.RepoCacheTTL)
 
-	provider.NewProvider(r, db, cf).RegisterServiceProvider().RegisterRouteProvider()
+	provider.NewProvider(r, db, cf).RegisterServiceProvider().RegisterBackgroundProvider().RegisterRouteProvider()
 
 	r.Run(fmt.Sprintf(":%d", cf.App.Port))
 }

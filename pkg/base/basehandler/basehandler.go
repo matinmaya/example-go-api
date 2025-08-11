@@ -2,6 +2,11 @@ package basehandler
 
 import (
 	"net/http"
+	"reflect"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+
 	"reapp/pkg/context/dbctx"
 	"reapp/pkg/http/reqctx"
 	"reapp/pkg/http/reqvalidate"
@@ -10,19 +15,15 @@ import (
 	"reapp/pkg/mapper"
 	"reapp/pkg/paginator"
 	"reapp/pkg/queryfilter"
-	"reflect"
-
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
-type TScopeFunc[T any] func(*T) error
-type TScopeWithIDFunc[T any] func(*T, uint64) error
-type TRemoveFieldsFunc func(*[]string) error
-type TBeforeResponseFunc[T any] func(ctx *gin.Context, model *T) error
+type TScope[T any] func(*T) error
+type TScopeWithID[T any] func(*T, uint64) error
+type TAfterValidate[T any] func(ctx *gin.Context, modelDTO *T, fields *[]string) error
+type TBeforeResponse[T any] func(ctx *gin.Context, model *T) error
 
 type IServiceLister interface {
-	List(db *gorm.DB, pagination *paginator.Pagination, filters []queryfilter.QueryFilter) error
+	List(ctx *gin.Context, db *gorm.DB, pagination *paginator.Pagination, filters []queryfilter.QueryFilter) error
 }
 
 type IServiceGetter[T any] interface {
@@ -69,7 +70,7 @@ func Paginate(ctx *gin.Context, service IServiceLister, query any) {
 	queryValues := ctx.Request.URL.Query()
 	filters := queryfilter.ParseQueryByUrlValues(query, queryValues)
 
-	if err := service.List(db, &pagination, filters); err != nil {
+	if err := service.List(ctx, db, &pagination, filters); err != nil {
 		response.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
@@ -110,8 +111,9 @@ func Create[T1 any, T2 any](
 	service IServiceCreator[T1],
 	model *T1,
 	modelDTO *T2,
-	setValidationScope TScopeFunc[T2],
-	beforeResponse TBeforeResponseFunc[T1],
+	setValidationScope TScope[T2],
+	afterValidate TAfterValidate[T2],
+	beforeResponse TBeforeResponse[T1],
 ) {
 	db := dbctx.DB(ctx)
 	fields, bad := reqctx.GetFieldNames(ctx)
@@ -129,6 +131,13 @@ func Create[T1 any, T2 any](
 
 	if !reqvalidate.Validate(ctx, modelDTO) {
 		return
+	}
+
+	if afterValidate != nil {
+		if err := afterValidate(ctx, modelDTO, &fields); err != nil {
+			response.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+			return
+		}
 	}
 
 	if err := mapper.MapDTOToModel(model, modelDTO, fields); err != nil {
@@ -156,9 +165,9 @@ func Update[T1 any, T2 any](
 	ctx *gin.Context,
 	service IServiceUpdater[T1],
 	modelDTO *T2,
-	setValidationScope TScopeWithIDFunc[T2],
-	removeFields TRemoveFieldsFunc,
-	beforeResponse TBeforeResponseFunc[T1],
+	setValidationScope TScopeWithID[T2],
+	afterValidate TAfterValidate[T2],
+	beforeResponse TBeforeResponse[T1],
 ) {
 	db := dbctx.DB(ctx)
 	var id uint64
@@ -188,8 +197,8 @@ func Update[T1 any, T2 any](
 		return
 	}
 
-	if removeFields != nil {
-		if err := removeFields(&fields); err != nil {
+	if afterValidate != nil {
+		if err := afterValidate(ctx, modelDTO, &fields); err != nil {
 			response.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}

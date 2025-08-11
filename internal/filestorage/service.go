@@ -1,4 +1,4 @@
-package file
+package filestorage
 
 import (
 	"bytes"
@@ -17,14 +17,12 @@ import (
 	"github.com/google/uuid"
 )
 
-// Service provides higher level file operations for handlers.
 type Service struct {
 	store Storage
 }
 
 func NewService(s Storage) *Service { return &Service{store: s} }
 
-// SaveUpload reads a multipart file and stores it. Returns key or URL.
 func (s *Service) SaveUpload(ctx context.Context, prefixPath string, fh *multipart.FileHeader) (string, error) {
 	f, err := fh.Open()
 	if err != nil {

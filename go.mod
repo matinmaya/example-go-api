@@ -8,6 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.86.0
 	github.com/chai2010/webp v1.4.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/disintegration/imaging v1.6.2
 	github.com/gin-gonic/gin v1.10.1
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/go-playground/validator/v10 v10.20.0
@@ -68,6 +69,7 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	golang.org/x/arch v0.8.0 // indirect
+	golang.org/x/image v0.0.0-20211028202545-6944b10bf410 // indirect
 	golang.org/x/net v0.41.0 // indirect
 	golang.org/x/sys v0.34.0 // indirect
 	golang.org/x/text v0.28.0 // indirect

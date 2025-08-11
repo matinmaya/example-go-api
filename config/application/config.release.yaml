@@ -46,3 +46,8 @@ storage:
     secret_key:
     endpoint:
     max_size_mb: 100
+
+  cache:
+    path: ./storages/cache
+    max_age_min: 2
+    cleanup_interval_min: 1

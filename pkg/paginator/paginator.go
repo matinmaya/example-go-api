@@ -3,11 +3,12 @@ package paginator
 import (
 	"encoding/json"
 	"math"
+
+	"gorm.io/gorm"
+
 	"reapp/pkg/crypto"
 	"reapp/pkg/queryfilter"
 	"reapp/pkg/services/rediservice"
-
-	"gorm.io/gorm"
 )
 
 type Pagination struct {

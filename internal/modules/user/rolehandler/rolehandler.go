@@ -1,13 +1,13 @@
 package rolehandler
 
 import (
+	"github.com/gin-gonic/gin"
+
 	"reapp/internal/modules/user/rolemodel"
 	"reapp/internal/modules/user/roleservice"
 	"reapp/pkg/base/basehandler"
 	"reapp/pkg/services/rediservice"
 	"reapp/pkg/validators"
-
-	"github.com/gin-gonic/gin"
 )
 
 type RoleHandler struct {
@@ -31,18 +31,14 @@ func (h *RoleHandler) GetDetail(ctx *gin.Context) {
 }
 
 func (h *RoleHandler) Create(ctx *gin.Context) {
-	basehandler.Create(ctx, h.service, &rolemodel.Role{}, &rolemodel.Role{}, nil, nil)
+	basehandler.Create(ctx, h.service, &rolemodel.Role{}, &rolemodel.Role{}, nil, nil, beforeResponse(false))
 }
 
 func (h *RoleHandler) Update(ctx *gin.Context) {
 	basehandler.Update(ctx, h.service, &rolemodel.Role{}, func(role *rolemodel.Role, id uint64) error {
 		role.UniqueScope = validators.ExceptByID(id)
 		return nil
-	}, nil, func(ctx *gin.Context, role *rolemodel.Role) error {
-		role.PermissionIds = []uint32{}
-		go rediservice.ClearCacheOfPerms()
-		return nil
-	})
+	}, nil, beforeResponse(true))
 }
 
 func (h *RoleHandler) Delete(ctx *gin.Context) {
@@ -50,4 +46,14 @@ func (h *RoleHandler) Delete(ctx *gin.Context) {
 		go rediservice.ClearCacheOfPerms()
 		return nil
 	})
+}
+
+func beforeResponse(isUpdate bool) func(ctx *gin.Context, role *rolemodel.Role) error {
+	return func(ctx *gin.Context, role *rolemodel.Role) error {
+		role.PermissionIds = []uint32{}
+		if isUpdate {
+			go rediservice.ClearCacheOfPerms()
+		}
+		return nil
+	}
 }

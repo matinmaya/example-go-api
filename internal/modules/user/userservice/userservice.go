@@ -3,14 +3,16 @@ package userservice
 import (
 	"fmt"
 	"log"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+
 	"reapp/internal/modules/user/usermodel"
 	"reapp/internal/modules/user/userrepository"
 	"reapp/pkg/crypto"
 	"reapp/pkg/lang"
 	"reapp/pkg/paginator"
 	"reapp/pkg/queryfilter"
-
-	"gorm.io/gorm"
 )
 
 type IUserService interface {
@@ -18,7 +20,7 @@ type IUserService interface {
 	Update(db *gorm.DB, user *usermodel.User) error
 	GetByID(db *gorm.DB, id uint64) (*usermodel.User, error)
 	Delete(db *gorm.DB, id uint64) error
-	List(db *gorm.DB, pg *paginator.Pagination, filters []queryfilter.QueryFilter) error
+	List(ctx *gin.Context, db *gorm.DB, pg *paginator.Pagination, filters []queryfilter.QueryFilter) error
 	ChangePassword(db *gorm.DB, data usermodel.ChangePassword) error
 }
 
@@ -105,8 +107,8 @@ func (s *UserService) Delete(db *gorm.DB, id uint64) error {
 	return s.repository.Delete(db, uint32(id))
 }
 
-func (s *UserService) List(db *gorm.DB, pg *paginator.Pagination, filters []queryfilter.QueryFilter) error {
-	return s.repository.List(db, pg, filters)
+func (s *UserService) List(ctx *gin.Context, db *gorm.DB, pg *paginator.Pagination, filters []queryfilter.QueryFilter) error {
+	return s.repository.List(ctx, db, pg, filters)
 }
 
 func (s *UserService) ChangePassword(db *gorm.DB, data usermodel.ChangePassword) error {

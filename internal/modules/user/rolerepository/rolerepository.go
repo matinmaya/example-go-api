@@ -1,13 +1,14 @@
 package rolerepository
 
 import (
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+
 	"reapp/internal/modules/user/rolemodel"
 	"reapp/internal/modules/user/usermodel"
 	"reapp/pkg/paginator"
 	"reapp/pkg/queryfilter"
 	"reapp/pkg/services/rediservice"
-
-	"gorm.io/gorm"
 )
 
 type RoleRepository struct {
@@ -63,7 +64,7 @@ func (r *RoleRepository) GetAll(db *gorm.DB) ([]rolemodel.Role, error) {
 	return roles, nil
 }
 
-func (r *RoleRepository) List(db *gorm.DB, pg *paginator.Pagination, filters []queryfilter.QueryFilter) error {
+func (r *RoleRepository) List(ctx *gin.Context, db *gorm.DB, pg *paginator.Pagination, filters []queryfilter.QueryFilter) error {
 	var roles []rolemodel.Role
 	scope := paginator.Paginate(db, r.namespace, &rolemodel.Role{}, pg, filters)
 

@@ -58,6 +58,12 @@ type Config struct {
 			Endpoint  string `yaml:"endpoint"`
 			MaxSizeMB int    `yaml:"max_size_mb"`
 		} `yaml:"s3"`
+
+		Cache struct {
+			Path               string `yaml:"path"`
+			MaxAgeMin          int    `yaml:"max_age_min"`
+			CleanupIntervalMin int    `yaml:"cleanup_interval_min"`
+		} `yaml:"cache"`
 	} `yaml:"storage"`
 }
 
