@@ -14,8 +14,8 @@ func (p *Provider) RegisterRouteProvider() *Provider {
 	p.r.Use(langmw.Language())
 	p.r.Use(dbmw.WithDBContext(p.db))
 
-	storage := filestorage.FileStorageProvider(p.cf.Storage.Provider, p.cf.Storage.Local.BasePath)
-	filestorage.RegisterFileRoute(p.r.Group(p.cf.Storage.Local.PrefixRoute), storage)
+	storage := filestorage.FileStorageProvider(p.cf.Storage.Provider, p.cf.Storage.Local.BasePath, p.cf.Storage.Cache.Path)
+	filestorage.RegisterFileRoute(p.r.Group(p.cf.Storage.PrefixRoute), storage)
 
 	router.NewRouter(p.r, p.db).UseAdminRouter().UseFrontendRouter().UseNotFoundRouter()
 	register.UseRoutes(p.r.Group("/"))

@@ -5,6 +5,7 @@ import (
 
 	"reapp/internal/modules/user/usermigration"
 	"reapp/pkg/base/basemodel"
+	"reapp/pkg/filesystem"
 	"reapp/pkg/services/jwtservice"
 	"reapp/pkg/validators"
 )
@@ -16,6 +17,7 @@ func (p *Provider) RegisterServiceProvider() *Provider {
 		p.cf.JWT.RefreshTokenTTL,
 	)
 
+	filesystem.SetPrefixRoutePath(p.cf.Storage.PrefixRoute)
 	p.db.AutoMigrate(&basemodel.TableLog{}, &basemodel.HttpLog{})
 	usermigration.Migrate(p.db)
 

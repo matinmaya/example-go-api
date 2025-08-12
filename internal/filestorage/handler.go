@@ -20,6 +20,7 @@ import (
 	"github.com/disintegration/imaging"
 	"github.com/gin-gonic/gin"
 
+	"reapp/pkg/filesystem"
 	"reapp/pkg/http/response"
 )
 
@@ -44,7 +45,7 @@ func (h *FileHandler) Upload(ctx *gin.Context) {
 
 	response.AsJSON(ctx, gin.H{
 		"path":      keyOrURL,
-		"full_path": ctx.Request.Host + "/storages" + keyOrURL,
+		"full_path": ctx.Request.Host + "/" + filesystem.TrimPath(filesystem.PrefixRoutePath()) + keyOrURL,
 	}, nil)
 }
 
@@ -106,7 +107,7 @@ func (h *FileHandler) UploadImage(ctx *gin.Context) {
 
 	response.AsJSON(ctx, gin.H{
 		"path":      keyOrURL,
-		"full_path": ctx.Request.Host + "/storages" + keyOrURL,
+		"full_path": ctx.Request.Host + "/" + filesystem.TrimPath(filesystem.PrefixRoutePath()) + keyOrURL,
 	}, nil)
 }
 
@@ -162,12 +163,14 @@ func (h *FileHandler) ServeFile(ctx *gin.Context) {
 		if fillFlag {
 			fillSuffix = "1"
 		}
-		cacheRel := filepath.Join("cache", filepath.Dir(p), fmt.Sprintf("%s_w%s_h%s_f%s%s", name, wStr, hStr, fillSuffix, ext))
-		cachePath := filepath.Join("storages", cacheRel)
 
-		if cachedData, err := os.ReadFile(cachePath); err == nil {
-			ctx.Data(http.StatusOK, ct, cachedData)
-			return
+		cachePath := ""
+		if filesystem.IsValidStoragePath(CacheRootPath()) {
+			cachePath = filepath.Join(CacheRootPath(), filepath.Dir(p), fmt.Sprintf("%s_w%s_h%s_f%s%s", name, wStr, hStr, fillSuffix, ext))
+			if cachedData, err := os.ReadFile(cachePath); err == nil {
+				ctx.Data(http.StatusOK, ct, cachedData)
+				return
+			}
 		}
 
 		img, _, err := image.Decode(bytes.NewReader(data))
@@ -210,11 +213,13 @@ func (h *FileHandler) ServeFile(ctx *gin.Context) {
 			data = buf.Bytes()
 		}
 
-		if err := os.MkdirAll(filepath.Dir(cachePath), 0755); err != nil {
-			log.Printf("write cache image: %s", err.Error())
-		}
-		if err := os.WriteFile(cachePath, data, 0644); err != nil {
-			log.Printf("write cache image: %s", err.Error())
+		if filesystem.IsValidStoragePath(CacheRootPath()) {
+			if err := os.MkdirAll(filepath.Dir(cachePath), 0755); err != nil {
+				log.Printf("write cache image: %s", err.Error())
+			}
+			if err := os.WriteFile(cachePath, data, 0644); err != nil {
+				log.Printf("write cache image: %s", err.Error())
+			}
 		}
 	}
 

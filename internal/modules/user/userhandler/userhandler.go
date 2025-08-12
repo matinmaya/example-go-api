@@ -80,7 +80,7 @@ func beforeResponse(isUpdate bool) func(ctx *gin.Context, user *usermodel.User) 
 	return func(ctx *gin.Context, user *usermodel.User) error {
 		user.RoleIds = []uint16{}
 		if user.Img != "" {
-			user.Img = filesystem.GetFullImageURL(ctx, user.Img)
+			user.Img = filesystem.FullImageURL(ctx, user.Img)
 		}
 		if isUpdate {
 			go rediservice.RemoveCacheOfAuthUser(fmt.Sprintf("%v", user.ID))

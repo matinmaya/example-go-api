@@ -5,10 +5,17 @@ import (
 	"log"
 )
 
-func FileStorageProvider(location string, localBasePath string) Storage {
+var cacheRootPath string
+
+func CacheRootPath() string {
+	return cacheRootPath
+}
+
+func FileStorageProvider(location string, localBasePath string, cachePath string) Storage {
 	var storage Storage
 	var err error
 
+	cacheRootPath = cachePath
 	switch location {
 	case "s3":
 		storage, err = NewS3StorageFromEnv(context.Background())

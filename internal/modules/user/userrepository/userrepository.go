@@ -57,7 +57,7 @@ func (r *UserRepository) List(ctx *gin.Context, db *gorm.DB, pg *paginator.Pagin
 
 	for i := range users {
 		if users[i].Img != "" {
-			users[i].Img = filesystem.GetFullImageURL(ctx, users[i].Img)
+			users[i].Img = filesystem.FullImageURL(ctx, users[i].Img)
 		}
 	}
 	pg.SetRows(users)

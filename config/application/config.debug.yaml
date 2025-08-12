@@ -34,10 +34,10 @@ redis:
 
 storage:
   provider: local
+  prefix_route: /public
 
   local:
     base_path: ./storages/uploads
-    prefix_route: /storages
     max_size_mb: 100
 
   s3:
