@@ -2,10 +2,11 @@ package validators
 
 import (
 	"fmt"
-	"reapp/pkg/lang"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator"
+
+	"reapp/pkg/lang"
 )
 
 func Message(ctx *gin.Context, fe validator.FieldError) string {
@@ -30,6 +31,8 @@ func Message(ctx *gin.Context, fe validator.FieldError) string {
 		return lang.Tran(ctx, "validation", "unique")
 	case "path":
 		return lang.Tran(ctx, "validation", "path")
+	case "slug_strict":
+		return lang.Tran(ctx, "validation", "slug_strict")
 	default:
 		return fmt.Sprintf("Validation failed on field '%s' with tag '%s'", fe.Field(), fe.Tag())
 	}

@@ -24,8 +24,8 @@ type SoftFields struct {
 	CreatedBy *uint32        `json:"created_by"`
 	UpdatedBy *uint32        `json:"updated_by"`
 	DeletedBy *uint32        `json:"-"`
-	CreatedAt DateTimeFormat `json:"created_at"`
-	UpdatedAt DateTimeFormat `json:"updated_at"`
+	CreatedAt TDateTime      `json:"created_at"`
+	UpdatedAt TDateTime      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
 }
 

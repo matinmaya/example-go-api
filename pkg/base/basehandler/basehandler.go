@@ -1,8 +1,8 @@
 package basehandler
 
 import (
+	"log"
 	"net/http"
-	"reflect"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -23,7 +23,7 @@ type TAfterValidate[T any] func(ctx *gin.Context, modelDTO *T, fields *[]string)
 type TBeforeResponse[T any] func(ctx *gin.Context, model *T) error
 
 type IServiceLister interface {
-	List(ctx *gin.Context, db *gorm.DB, pagination *paginator.Pagination, filters []queryfilter.QueryFilter) error
+	List(ctx *gin.Context, db *gorm.DB, pagination *paginator.Pagination, filterFields []queryfilter.FilterField) error
 }
 
 type IServiceGetter[T any] interface {
@@ -47,30 +47,25 @@ type IServiceDeleter interface {
 	Delete(db *gorm.DB, id uint64) error
 }
 
-func Paginate(ctx *gin.Context, service IServiceLister, query any) {
+func Paginate[T any](ctx *gin.Context, service IServiceLister, query *T) {
 	db := dbctx.DB(ctx)
 	var pagination paginator.Pagination
 
-	valueOfQuery := reflect.ValueOf(query)
-	if valueOfQuery.Kind() != reflect.Ptr {
-		response.Error(ctx, http.StatusInternalServerError, lang.Tran(ctx, "internal", "required_pointer"), nil)
-		return
-	}
-
-	if err := ctx.ShouldBindQuery(query); err != nil {
-		response.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+	if err := ctx.ShouldBindQuery(&query); err != nil {
+		log.Printf("%s", err.Error())
+		response.Error(ctx, http.StatusBadRequest, lang.Tran(ctx, "validation", "invalid_query_params"), nil)
 		return
 	}
 
 	if err := ctx.ShouldBindQuery(&pagination); err != nil {
-		response.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+		log.Printf("%s", err.Error())
+		response.Error(ctx, http.StatusBadRequest, lang.Tran(ctx, "validation", "invalid_query_params"), nil)
 		return
 	}
 
-	queryValues := ctx.Request.URL.Query()
-	filters := queryfilter.ParseQueryByUrlValues(query, queryValues)
-
-	if err := service.List(ctx, db, &pagination, filters); err != nil {
+	values := ctx.Request.URL.Query()
+	filterFields := queryfilter.FilterFields(query, values)
+	if err := service.List(ctx, db, &pagination, filterFields); err != nil {
 		response.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}

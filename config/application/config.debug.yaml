@@ -18,8 +18,8 @@ database:
 jwt:
   secret: 432d7dc86437d09e9ba68e8d2572525c
   issuer: HS256
-  access_token_ttl: 60
-  refresh_token_ttl: 43200
+  access_token_ttl: 60000
+  refresh_token_ttl: 43200000
 
 log:
   level: debug  
@@ -37,6 +37,7 @@ storage:
 
   local:
     base_path: ./storages/uploads
+    prefix_route: /storages
     max_size_mb: 100
 
   s3:

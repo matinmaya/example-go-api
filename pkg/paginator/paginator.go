@@ -18,7 +18,7 @@ type Pagination struct {
 	SortDir       string                    `json:"sort_dir,omitempty" form:"sort_dir"`
 	Total         int                       `json:"total"`
 	TotalPage     int                       `json:"total_page"`
-	Filters       []queryfilter.QueryFilter `json:"-"`
+	FilterFields  []queryfilter.FilterField `json:"-"`
 	ListCacheKey  string                    `json:"-"`
 	CountCacheKey string                    `json:"-"`
 	Rows          interface{}               `json:"data"`
@@ -47,9 +47,9 @@ func (p *Pagination) GetSort() string {
 	if sortField == "" {
 		sortField = "created_at"
 	}
-	direction := "asc"
-	if p.SortDir == "desc" {
-		direction = "desc"
+	direction := "desc"
+	if p.SortDir == "asc" {
+		direction = "asc"
 	}
 	return sortField + " " + direction
 }
@@ -58,15 +58,16 @@ func (p *Pagination) SetRows(rows interface{}) {
 	p.Rows = rows
 }
 
-func Paginate(db *gorm.DB, repositoryNamespace string, dbModel interface{}, pg *Pagination, filters []queryfilter.QueryFilter) func(db *gorm.DB) *gorm.DB {
+func Paginate(db *gorm.DB, repositoryNamespace string, dbModel interface{}, pg *Pagination, filterFields []queryfilter.FilterField) func(db *gorm.DB) *gorm.DB {
 	var total int64
 	if pg.Page < 1 {
 		pg.Page = 1
 	}
 
+	pg.FilterFields = filterFields
 	collectionKey := "count"
 	if err := rediservice.CacheOfRepository(repositoryNamespace, collectionKey, pg.GetCountCacheKey(), &total); err != nil {
-		filteredDB := queryfilter.QueryFilterScopes(db.Model(dbModel), filters)
+		filteredDB := queryfilter.FilterDBScopes(db.Model(dbModel), filterFields)
 		filteredDB.Count(&total)
 
 		rediservice.SetCacheOfRepository(repositoryNamespace, collectionKey, pg.GetCountCacheKey(), total)
@@ -77,22 +78,22 @@ func Paginate(db *gorm.DB, repositoryNamespace string, dbModel interface{}, pg *
 
 	return func(db *gorm.DB) *gorm.DB {
 		offset := pg.GetOffset()
-		return queryfilter.QueryFilterScopes(db, filters).Offset(offset).Limit(pg.GetLimit()).Order(pg.GetSort())
+		return queryfilter.FilterDBScopes(db, filterFields).Offset(offset).Limit(pg.GetLimit()).Order(pg.GetSort())
 	}
 }
 
 func (p *Pagination) GenerateListKey() (string, error) {
-	bFilter, err := json.Marshal(p.Filters)
+	filterBytes, err := json.Marshal(p.FilterFields)
 	if err != nil {
 		return "", err
 	}
 
 	fields := map[string]interface{}{
-		"Limit":   p.GetLimit(),
-		"Page":    p.GetPage(),
-		"Offset":  p.GetOffset(),
-		"Order":   p.GetSort(),
-		"Filters": string(bFilter),
+		"Limit":        p.GetLimit(),
+		"Page":         p.GetPage(),
+		"Offset":       p.GetOffset(),
+		"Order":        p.GetSort(),
+		"FilterFields": string(filterBytes),
 	}
 
 	keys, err := json.Marshal(fields)
@@ -104,12 +105,12 @@ func (p *Pagination) GenerateListKey() (string, error) {
 }
 
 func (p *Pagination) GenerateCountKey() (string, error) {
-	bFilter, err := json.Marshal(p.Filters)
+	filterBytes, err := json.Marshal(p.FilterFields)
 	if err != nil {
 		return "", err
 	}
 
-	return crypto.CacheKey(string(bFilter)), nil
+	return crypto.CacheKey(string(filterBytes)), nil
 }
 
 func (p *Pagination) GetListCacheKey() string {

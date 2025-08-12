@@ -28,4 +28,5 @@ func customValidator(p *Provider) {
 	vlt := validators.InitValidation(p.db, validator.New())
 	vlt.RegisterValidation("unique", validators.Unique)
 	vlt.RegisterValidation("path", validators.Path)
+	vlt.RegisterValidation("slug_strict", validators.SlugStrict)
 }

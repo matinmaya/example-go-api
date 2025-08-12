@@ -65,7 +65,7 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 	uaString := ctx.Request.UserAgent()
 	ip := ctx.ClientIP()
 	device, platform, browser, os := logger.ParseUserAgent(uaString)
-	expiresAt := basemodel.DateTimeFormat{Time: time.Unix(refreshClaims.ExpiresAt, 0)}
+	expiresAt := basemodel.TDateTime{Time: time.Unix(refreshClaims.ExpiresAt, 0)}
 	tokenInfo := &usermodel.TokenInfo{
 		UserID:       user.ID,
 		JTI:          refreshClaims.Id,
@@ -87,7 +87,7 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 		Username:     user.Username,
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
-		ExpiresAt:    basemodel.DateTimeFormat{Time: time.Unix(accessClaims.ExpiresAt, 0)},
+		ExpiresAt:    basemodel.TDateTime{Time: time.Unix(accessClaims.ExpiresAt, 0)},
 	}
 	response.Success(ctx, http.StatusOK, lang.Tran(ctx, "auth", "login_success"), data)
 }
@@ -165,7 +165,7 @@ func (h *AuthHandler) Refresh(ctx *gin.Context) {
 
 	tokenInfo.JTI = refreshClaims.Id
 	tokenInfo.RefreshToken = hashedNewRefresh
-	tokenInfo.ExpiresAt = basemodel.DateTimeFormat{Time: time.Unix(refreshClaims.ExpiresAt, 0)}
+	tokenInfo.ExpiresAt = basemodel.TDateTime{Time: time.Unix(refreshClaims.ExpiresAt, 0)}
 	if err := h.service.UpdateTokenInfo(db, tokenInfo); err != nil {
 		response.Error(ctx, http.StatusInternalServerError, lang.Tran(ctx, "auth", "failed_update_token"), nil)
 		return
@@ -175,7 +175,7 @@ func (h *AuthHandler) Refresh(ctx *gin.Context) {
 		Username:     user.Username,
 		AccessToken:  accessToken,
 		RefreshToken: newRefreshToken,
-		ExpiresAt:    basemodel.DateTimeFormat{Time: time.Unix(accessClaims.ExpiresAt, 0)},
+		ExpiresAt:    basemodel.TDateTime{Time: time.Unix(accessClaims.ExpiresAt, 0)},
 	}
 	response.Success(ctx, http.StatusOK, lang.Tran(ctx, "auth", "token_refreshed"), data)
 }

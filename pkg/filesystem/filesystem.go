@@ -1,4 +1,4 @@
-package bucket
+package filesystem
 
 import (
 	"net/url"
@@ -8,6 +8,12 @@ import (
 
 	"reapp/pkg/redisclient"
 )
+
+var prefixRoutePath string
+
+func SetPrefixRoute(prefix string) {
+	prefixRoutePath = prefix
+}
 
 func GetImagePath(fullURL string) string {
 	u, err := url.Parse(fullURL)
@@ -39,10 +45,15 @@ func GetFullImageURL(ctx *gin.Context, imagePath string) string {
 	return strings.TrimRight(baseURL, "/") + "/" + strings.TrimLeft(imagePath, "/")
 }
 
+func TrimPath(path string) string {
+	str := strings.TrimRight(path, "/")
+	return strings.TrimLeft(str, "/")
+}
+
 func getCurrentServerURL(ctx *gin.Context) string {
 	scheme := "http"
 	if ctx.Request.TLS != nil {
 		scheme = "https"
 	}
-	return scheme + "://" + ctx.Request.Host + "/storages"
+	return scheme + "://" + ctx.Request.Host + TrimPath(prefixRoutePath)
 }

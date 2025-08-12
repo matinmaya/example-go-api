@@ -20,7 +20,6 @@ func NewLocalStorage(baseDir string) (*LocalStorage, error) {
 }
 
 func (l *LocalStorage) fullPath(key string) string {
-	// key might start with /, clean it
 	k := filepath.Clean(key)
 	return filepath.Join(l.base, k)
 }

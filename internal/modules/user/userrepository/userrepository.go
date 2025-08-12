@@ -5,7 +5,7 @@ import (
 	"gorm.io/gorm"
 
 	"reapp/internal/modules/user/usermodel"
-	"reapp/pkg/bucket"
+	"reapp/pkg/filesystem"
 	"reapp/pkg/paginator"
 	"reapp/pkg/queryfilter"
 	"reapp/pkg/services/rediservice"
@@ -41,13 +41,13 @@ func (UserRepository) GetByID(db *gorm.DB, id uint32) (*usermodel.User, error) {
 	return &user, err
 }
 
-func (r *UserRepository) List(ctx *gin.Context, db *gorm.DB, pg *paginator.Pagination, filters []queryfilter.QueryFilter) error {
+func (r *UserRepository) List(ctx *gin.Context, db *gorm.DB, pg *paginator.Pagination, filterFields []queryfilter.FilterField) error {
 	var users []usermodel.User
-	scope := paginator.Paginate(db, r.namespace, &usermodel.User{}, pg, filters)
+	scopes := paginator.Paginate(db, r.namespace, &usermodel.User{}, pg, filterFields)
 
 	collectionKey := "list"
 	if err := rediservice.CacheOfRepository(r.namespace, collectionKey, pg.GetListCacheKey(), &users); err != nil {
-		err := db.Scopes(scope).Find(&users).Error
+		err := db.Scopes(scopes).Find(&users).Error
 		if err != nil {
 			return err
 		}
@@ -57,7 +57,7 @@ func (r *UserRepository) List(ctx *gin.Context, db *gorm.DB, pg *paginator.Pagin
 
 	for i := range users {
 		if users[i].Img != "" {
-			users[i].Img = bucket.GetFullImageURL(ctx, users[i].Img)
+			users[i].Img = filesystem.GetFullImageURL(ctx, users[i].Img)
 		}
 	}
 	pg.SetRows(users)

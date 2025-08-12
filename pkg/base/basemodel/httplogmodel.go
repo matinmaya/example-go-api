@@ -9,7 +9,7 @@ type HttpLog struct {
 	UserAgent  string
 	IP         string
 	StatusCode int
-	CreatedAt  DateTimeFormat `json:"created_at"`
+	CreatedAt  TDateTime `json:"created_at"`
 }
 
 func (HttpLog) TableName() string {

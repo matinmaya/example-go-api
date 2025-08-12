@@ -1,11 +1,13 @@
 package jwtservice
 
 import (
-	"reapp/internal/modules/user/usermodel"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
+
+	"reapp/internal/modules/user/usermodel"
+	"reapp/pkg/base/basemodel"
 )
 
 var JWTSecret = []byte("")
@@ -13,9 +15,9 @@ var AccessTokenTTL = 60 * time.Minute
 var RefreshTokenTTL = 30 * 24 * time.Hour
 
 type Claims struct {
-	UserID   uint32   `json:"user_id"`
-	RoleIDs  []uint16 `json:"role_ids"`
-	Username string   `json:"username"`
+	UserID   uint32            `json:"user_id"`
+	RoleIDs  []uint16          `json:"role_ids"`
+	Username basemodel.TString `json:"username"`
 	jwt.StandardClaims
 }
 

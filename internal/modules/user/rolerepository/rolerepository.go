@@ -64,13 +64,13 @@ func (r *RoleRepository) GetAll(db *gorm.DB) ([]rolemodel.Role, error) {
 	return roles, nil
 }
 
-func (r *RoleRepository) List(ctx *gin.Context, db *gorm.DB, pg *paginator.Pagination, filters []queryfilter.QueryFilter) error {
+func (r *RoleRepository) List(ctx *gin.Context, db *gorm.DB, pg *paginator.Pagination, filterFields []queryfilter.FilterField) error {
 	var roles []rolemodel.Role
-	scope := paginator.Paginate(db, r.namespace, &rolemodel.Role{}, pg, filters)
+	scopes := paginator.Paginate(db, r.namespace, &rolemodel.Role{}, pg, filterFields)
 
 	collectionKey := "list"
 	if err := rediservice.CacheOfRepository(r.namespace, collectionKey, pg.GetListCacheKey(), &roles); err != nil {
-		err := db.Scopes(scope).Find(&roles).Error
+		err := db.Scopes(scopes).Find(&roles).Error
 		if err != nil {
 			return err
 		}

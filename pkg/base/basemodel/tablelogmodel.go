@@ -10,7 +10,7 @@ type TableLog struct {
 	ChangedData json.RawMessage `json:"changed_data"`
 	FullData    json.RawMessage `json:"full_data"`
 	CreatedBy   *uint32         `json:"created_by"`
-	CreatedAt   DateTimeFormat  `json:"created_at"`
+	CreatedAt   TDateTime       `json:"created_at"`
 }
 
 func (TableLog) TableName() string {

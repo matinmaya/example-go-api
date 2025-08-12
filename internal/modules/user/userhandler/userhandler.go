@@ -9,8 +9,8 @@ import (
 	"reapp/internal/modules/user/usermodel"
 	"reapp/internal/modules/user/userservice"
 	"reapp/pkg/base/basehandler"
-	"reapp/pkg/bucket"
 	"reapp/pkg/context/dbctx"
+	"reapp/pkg/filesystem"
 	"reapp/pkg/http/reqctx"
 	"reapp/pkg/http/reqvalidate"
 	"reapp/pkg/http/response"
@@ -63,13 +63,12 @@ func (h *UserHandler) ChangePassword(ctx *gin.Context) {
 func afterValidate(isUpdate bool) func(ctx *gin.Context, user *usermodel.User, fields *[]string) error {
 	return func(ctx *gin.Context, user *usermodel.User, fields *[]string) error {
 		if isUpdate {
-			fmt.Println("is update")
 			reqctx.RemoveFields(fields, "Password")
 		}
 		if user.Img != "" {
-			if bucket.IsFullImagePath(user.Img) {
+			if filesystem.IsFullImagePath(user.Img) {
 				reqctx.RemoveFields(fields, "Img")
-			} else if !bucket.IsAbsoluteImagePath(user.Img) {
+			} else if !filesystem.IsAbsoluteImagePath(user.Img) {
 				return errors.New("invalid image path format: must start with '/' or be a full URL")
 			}
 		}
@@ -81,7 +80,7 @@ func beforeResponse(isUpdate bool) func(ctx *gin.Context, user *usermodel.User) 
 	return func(ctx *gin.Context, user *usermodel.User) error {
 		user.RoleIds = []uint16{}
 		if user.Img != "" {
-			user.Img = bucket.GetFullImageURL(ctx, user.Img)
+			user.Img = filesystem.GetFullImageURL(ctx, user.Img)
 		}
 		if isUpdate {
 			go rediservice.RemoveCacheOfAuthUser(fmt.Sprintf("%v", user.ID))

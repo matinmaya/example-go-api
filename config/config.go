@@ -46,8 +46,9 @@ type Config struct {
 		Provider string `yaml:"provider"`
 
 		Local struct {
-			BasePath  string `yaml:"base_path"`
-			MaxSizeMB int    `yaml:"max_size_mb"`
+			BasePath    string `yaml:"base_path"`
+			PrefixRoute string `yaml:"prefix_route"`
+			MaxSizeMB   int    `yaml:"max_size_mb"`
 		} `yaml:"local"`
 
 		S3 struct {
