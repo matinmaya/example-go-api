@@ -3,11 +3,12 @@ package basemodel
 import (
 	"encoding/json"
 	"fmt"
-	"reapp/pkg/context/authctx"
 	"reflect"
 	"strconv"
 
 	"gorm.io/gorm"
+
+	"reapp/pkg/context/authctx"
 )
 
 func (s *SoftFields) BeforeCreate(tx *gorm.DB) error {
@@ -19,8 +20,6 @@ func (s *SoftFields) BeforeCreate(tx *gorm.DB) error {
 
 	return nil
 }
-
-var modelValue map[string]interface{}
 
 func (s *SoftFields) BeforeUpdate(tx *gorm.DB) error {
 	if uid := GetUserID(tx); uid != nil {
@@ -53,7 +52,7 @@ func (s *SoftFields) BeforeUpdate(tx *gorm.DB) error {
 		return fmt.Errorf("fetching original model before update: %w", err)
 	}
 
-	if err := SetBfChangeValueFromInstance(tx, model); err != nil {
+	if err := SetOldValue(tx, model); err != nil {
 		return fmt.Errorf("setting model value: %w", err)
 	}
 
@@ -76,7 +75,7 @@ func (s *SoftFields) AfterUpdate(tx *gorm.DB) (err error) {
 		return nil
 	}
 
-	beforeChangeData := GetBfChangeValue(tx)
+	beforeChangeData := OldValue(tx)
 	changes := map[string]map[string]interface{}{}
 	for _, field := range tx.Statement.Schema.Fields {
 		var current interface{}

@@ -11,6 +11,8 @@ import (
 	"reapp/pkg/services/rediservice"
 )
 
+type TScopeDB func(db *gorm.DB) *gorm.DB
+
 type Pagination struct {
 	Limit         int                       `json:"limit,omitempty" form:"limit"`
 	Page          int                       `json:"page,omitempty" form:"page"`
@@ -58,7 +60,7 @@ func (p *Pagination) SetRows(rows interface{}) {
 	p.Rows = rows
 }
 
-func Paginate(db *gorm.DB, repositoryNamespace string, dbModel interface{}, pg *Pagination, filterFields []queryfilter.FilterField) func(db *gorm.DB) *gorm.DB {
+func Paginate[T any](db *gorm.DB, repositoryNamespace string, model *T, pg *Pagination, filterFields []queryfilter.FilterField) TScopeDB {
 	var total int64
 	if pg.Page < 1 {
 		pg.Page = 1
@@ -67,8 +69,8 @@ func Paginate(db *gorm.DB, repositoryNamespace string, dbModel interface{}, pg *
 	pg.FilterFields = filterFields
 	collectionKey := "count"
 	if err := rediservice.CacheOfRepository(repositoryNamespace, collectionKey, pg.GetCountCacheKey(), &total); err != nil {
-		filteredDB := queryfilter.FilterDBScopes(db.Model(dbModel), filterFields)
-		filteredDB.Count(&total)
+		qfDB := queryfilter.FilterDBScopes(db.Model(model), filterFields)
+		qfDB.Count(&total)
 
 		rediservice.SetCacheOfRepository(repositoryNamespace, collectionKey, pg.GetCountCacheKey(), total)
 	}

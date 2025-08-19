@@ -9,9 +9,9 @@ import (
 
 type ctxKey string
 
-const bfChangeValueKey ctxKey = "bfChangeValue"
+const oldValueKey ctxKey = "oldValue"
 
-func SetBfChangeValueFromInstance(db *gorm.DB, instance any) error {
+func SetOldValue(db *gorm.DB, instance any) error {
 	data := make(map[string]interface{})
 
 	val := reflect.ValueOf(instance)
@@ -24,13 +24,13 @@ func SetBfChangeValueFromInstance(db *gorm.DB, instance any) error {
 		data[field.Name] = fieldVal
 	}
 
-	ctx := context.WithValue(db.Statement.Context, bfChangeValueKey, data)
+	ctx := context.WithValue(db.Statement.Context, oldValueKey, data)
 	db.Statement.Context = ctx
 	return nil
 }
 
-func GetBfChangeValue(tx *gorm.DB) map[string]interface{} {
-	data := tx.Statement.Context.Value(bfChangeValueKey)
+func OldValue(tx *gorm.DB) map[string]interface{} {
+	data := tx.Statement.Context.Value(oldValueKey)
 	if data == nil {
 		return nil
 	}

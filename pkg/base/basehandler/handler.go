@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 
 	"reapp/pkg/context/dbctx"
 	"reapp/pkg/http/reqctx"
@@ -16,36 +15,6 @@ import (
 	"reapp/pkg/paginator"
 	"reapp/pkg/queryfilter"
 )
-
-type TScope[T any] func(*T) error
-type TScopeWithID[T any] func(*T, uint64) error
-type TAfterValidate[T any] func(ctx *gin.Context, modelDTO *T, fields *[]string) error
-type TBeforeResponse[T any] func(ctx *gin.Context, model *T) error
-
-type IServiceLister interface {
-	List(ctx *gin.Context, db *gorm.DB, pagination *paginator.Pagination, filterFields []queryfilter.FilterField) error
-}
-
-type IServiceGetter[T any] interface {
-	GetAll(db *gorm.DB) ([]T, error)
-}
-
-type IServiceGetterDetail[T any] interface {
-	GetDetail(db *gorm.DB, id uint64) (*T, error)
-}
-
-type IServiceCreator[T any] interface {
-	Create(db *gorm.DB, model *T) error
-}
-
-type IServiceUpdater[T any] interface {
-	Update(db *gorm.DB, model *T) error
-	GetByID(db *gorm.DB, id uint64) (*T, error)
-}
-
-type IServiceDeleter interface {
-	Delete(db *gorm.DB, id uint64) error
-}
 
 func Paginate[T any](ctx *gin.Context, service IServiceLister, query *T) {
 	db := dbctx.DB(ctx)
@@ -135,7 +104,7 @@ func Create[T1 any, T2 any](
 		}
 	}
 
-	if err := mapper.MapDTOToModel(model, modelDTO, fields); err != nil {
+	if err := mapper.MapModel(model, modelDTO, fields); err != nil {
 		response.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
@@ -199,7 +168,7 @@ func Update[T1 any, T2 any](
 		}
 	}
 
-	if err := mapper.MapDTOToModel(model, modelDTO, fields); err != nil {
+	if err := mapper.MapModel(model, modelDTO, fields); err != nil {
 		response.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}

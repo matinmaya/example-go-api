@@ -4,8 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+
 	"reapp/pkg/redisclient"
 )
+
+func repositoryRoot() string {
+	return "repositories"
+}
 
 func CacheOfRepository[T any](namespace string, collection string, key string, data *T) error {
 	validate := map[string]string{
@@ -18,7 +23,7 @@ func CacheOfRepository[T any](namespace string, collection string, key string, d
 		return err
 	}
 
-	cacheKey := fmt.Sprintf("repositories:%s:%s:%s", namespace, collection, key)
+	cacheKey := fmt.Sprintf("%s:%s:%s:%s", repositoryRoot(), namespace, collection, key)
 	redisClient := redisclient.Client()
 	cached, err := redisClient.Get(cacheKey).Result()
 	if err != nil {
@@ -43,7 +48,7 @@ func SetCacheOfRepository[T any](namespace string, collection string, key string
 		return err
 	}
 
-	cacheKey := fmt.Sprintf("repositories:%s:%s:%s", namespace, collection, key)
+	cacheKey := fmt.Sprintf("%s:%s:%s:%s", repositoryRoot(), namespace, collection, key)
 	redisClient := redisclient.Client()
 	data, err := json.Marshal(params)
 	if err != nil {
@@ -67,7 +72,7 @@ func ClearCacheOfRepository(namespace string) error {
 		return err
 	}
 
-	prefixKey := fmt.Sprintf("repositories:%s:*", namespace)
+	prefixKey := fmt.Sprintf("%s:%s:*", repositoryRoot(), namespace)
 	redisClient := redisclient.Client()
 	iter := redisClient.Scan(0, prefixKey, 0).Iterator()
 	for iter.Next() {

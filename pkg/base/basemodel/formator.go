@@ -7,12 +7,6 @@ import (
 	"time"
 )
 
-type TDateTime struct {
-	time.Time
-}
-
-type TString string
-
 func (dtf *TDateTime) Scan(value interface{}) error {
 	if value == nil {
 		*dtf = TDateTime{Time: time.Time{}}
