@@ -20,7 +20,7 @@ type IRoleService interface {
 	GetByID(db *gorm.DB, id uint64) (*rolemodel.Role, error)
 	GetDetail(db *gorm.DB, id uint64) (*rolemodel.Role, error)
 	Delete(db *gorm.DB, id uint64) error
-	List(ctx *gin.Context, db *gorm.DB, pg *paginator.Pagination, filterFields []queryfilter.FilterField) error
+	List(ctx *gin.Context, db *gorm.DB, pg *paginator.Pagination[rolemodel.Role], filterFields []queryfilter.FilterField) error
 	GetAll(db *gorm.DB) ([]rolemodel.Role, error)
 }
 
@@ -121,6 +121,6 @@ func (s *RoleService) GetAll(db *gorm.DB) ([]rolemodel.Role, error) {
 	return s.repository.GetAll(db)
 }
 
-func (s *RoleService) List(ctx *gin.Context, db *gorm.DB, pg *paginator.Pagination, filterFields []queryfilter.FilterField) error {
+func (s *RoleService) List(ctx *gin.Context, db *gorm.DB, pg *paginator.Pagination[rolemodel.Role], filterFields []queryfilter.FilterField) error {
 	return s.repository.List(ctx, db, pg, filterFields)
 }

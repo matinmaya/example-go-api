@@ -27,7 +27,7 @@ func NewUserHandler(s userservice.IUserService) *UserHandler {
 }
 
 func (h *UserHandler) List(ctx *gin.Context) {
-	basehandler.Paginate(ctx, h.service, &usermodel.UserListQuery{})
+	basehandler.Paginate(ctx, h.service, &usermodel.UserListQuery{}, listBeforeResponse())
 }
 
 func (h *UserHandler) Create(ctx *gin.Context) {
@@ -70,6 +70,17 @@ func afterValidate(isUpdate bool) func(ctx *gin.Context, user *usermodel.User, f
 				reqctx.RemoveFields(fields, "Img")
 			} else if !filesystem.IsAbsoluteImagePath(user.Img) {
 				return errors.New("invalid image path format: must start with '/' or be a full URL")
+			}
+		}
+		return nil
+	}
+}
+
+func listBeforeResponse() func(*gin.Context, *[]usermodel.User) error {
+	return func(ctx *gin.Context, rows *[]usermodel.User) error {
+		for i := range *rows {
+			if (*rows)[i].Img != "" {
+				(*rows)[i].Img = filesystem.FullImageURL(ctx, (*rows)[i].Img)
 			}
 		}
 		return nil

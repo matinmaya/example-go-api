@@ -19,7 +19,7 @@ func NewRoleHandler(s roleservice.IRoleService) *RoleHandler {
 }
 
 func (h *RoleHandler) List(ctx *gin.Context) {
-	basehandler.Paginate(ctx, h.service, &rolemodel.RoleListQuery{})
+	basehandler.Paginate(ctx, h.service, &rolemodel.RoleListQuery{}, nil)
 }
 
 func (h *RoleHandler) GetAll(ctx *gin.Context) {

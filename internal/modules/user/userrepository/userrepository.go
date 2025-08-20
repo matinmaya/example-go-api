@@ -5,7 +5,6 @@ import (
 	"gorm.io/gorm"
 
 	"reapp/internal/modules/user/usermodel"
-	"reapp/pkg/filesystem"
 	"reapp/pkg/paginator"
 	"reapp/pkg/queryfilter"
 	"reapp/pkg/services/rediservice"
@@ -41,7 +40,7 @@ func (UserRepository) GetByID(db *gorm.DB, id uint32) (*usermodel.User, error) {
 	return &user, err
 }
 
-func (r *UserRepository) List(ctx *gin.Context, db *gorm.DB, pg *paginator.Pagination, filterFields []queryfilter.FilterField) error {
+func (r *UserRepository) List(ctx *gin.Context, db *gorm.DB, pg *paginator.Pagination[usermodel.User], filterFields []queryfilter.FilterField) error {
 	var users []usermodel.User
 	scopes := paginator.Paginate(db, r.namespace, &usermodel.User{}, pg, filterFields)
 
@@ -55,11 +54,6 @@ func (r *UserRepository) List(ctx *gin.Context, db *gorm.DB, pg *paginator.Pagin
 		rediservice.SetCacheOfRepository(r.namespace, collectionKey, pg.GetListCacheKey(), users)
 	}
 
-	for i := range users {
-		if users[i].Img != "" {
-			users[i].Img = filesystem.FullImageURL(ctx, users[i].Img)
-		}
-	}
 	pg.SetRows(users)
 	return nil
 }

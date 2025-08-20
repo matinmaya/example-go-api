@@ -8,8 +8,8 @@ import (
 	"reapp/pkg/queryfilter"
 )
 
-type IServiceLister interface {
-	List(ctx *gin.Context, db *gorm.DB, pagination *paginator.Pagination, filterFields []queryfilter.FilterField) error
+type IServiceLister[T any] interface {
+	List(ctx *gin.Context, db *gorm.DB, pagination *paginator.Pagination[T], filterFields []queryfilter.FilterField) error
 }
 
 type IServiceGetter[T any] interface {

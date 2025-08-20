@@ -6,3 +6,4 @@ type TScope[T any] func(*T) error
 type TScopeWithID[T any] func(*T, uint64) error
 type TAfterValidate[T any] func(ctx *gin.Context, modelDTO *T, fields *[]string) error
 type TBeforeResponse[T any] func(ctx *gin.Context, model *T) error
+type TListBeforeResponse[T any] func(ctx *gin.Context, models *[]T) error

@@ -1,12 +1,12 @@
 package userseeder
 
 import (
+	"gorm.io/gorm"
+
 	"reapp/internal/modules/user/permmodel"
 	"reapp/internal/modules/user/rolemodel"
 	"reapp/internal/modules/user/usermodel"
 	"reapp/pkg/crypto"
-
-	"gorm.io/gorm"
 )
 
 func Run(db *gorm.DB) error {
@@ -24,6 +24,10 @@ func Run(db *gorm.DB) error {
 		{Name: "permissions.create", Description: "Can create permissions"},
 		{Name: "permissions.update", Description: "Can update permissions"},
 		{Name: "permissions.delete", Description: "Can delete permissions"},
+		{Name: "customers.read", Description: "Can read customers"},
+		{Name: "customers.create", Description: "Can create customers"},
+		{Name: "customers.update", Description: "Can update customers"},
+		{Name: "customers.delete", Description: "Can delete customers"},
 	}
 
 	for _, p := range permissions {

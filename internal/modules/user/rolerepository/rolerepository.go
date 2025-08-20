@@ -64,7 +64,7 @@ func (r *RoleRepository) GetAll(db *gorm.DB) ([]rolemodel.Role, error) {
 	return roles, nil
 }
 
-func (r *RoleRepository) List(ctx *gin.Context, db *gorm.DB, pg *paginator.Pagination, filterFields []queryfilter.FilterField) error {
+func (r *RoleRepository) List(ctx *gin.Context, db *gorm.DB, pg *paginator.Pagination[rolemodel.Role], filterFields []queryfilter.FilterField) error {
 	var roles []rolemodel.Role
 	scopes := paginator.Paginate(db, r.namespace, &rolemodel.Role{}, pg, filterFields)
 

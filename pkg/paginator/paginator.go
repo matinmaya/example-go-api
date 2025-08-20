@@ -13,7 +13,7 @@ import (
 
 type TScopeDB func(db *gorm.DB) *gorm.DB
 
-type Pagination struct {
+type Pagination[T any] struct {
 	Limit         int                       `json:"limit,omitempty" form:"limit"`
 	Page          int                       `json:"page,omitempty" form:"page"`
 	SortBy        string                    `json:"sort_by,omitempty" form:"sort_by"`
@@ -23,28 +23,28 @@ type Pagination struct {
 	FilterFields  []queryfilter.FilterField `json:"-"`
 	ListCacheKey  string                    `json:"-"`
 	CountCacheKey string                    `json:"-"`
-	Rows          interface{}               `json:"data"`
+	Rows          []T                       `json:"data"`
 }
 
-func (p *Pagination) GetOffset() int {
+func (p *Pagination[T]) GetOffset() int {
 	return (p.GetPage() - 1) * p.GetLimit()
 }
 
-func (p *Pagination) GetPage() int {
+func (p *Pagination[T]) GetPage() int {
 	if p.Page <= 0 {
 		return 1
 	}
 	return p.Page
 }
 
-func (p *Pagination) GetLimit() int {
+func (p *Pagination[T]) GetLimit() int {
 	if p.Limit <= 0 || p.Limit > 1000 {
 		p.Limit = 10
 	}
 	return p.Limit
 }
 
-func (p *Pagination) GetSort() string {
+func (p *Pagination[T]) GetSort() string {
 	sortField := p.SortBy
 	if sortField == "" {
 		sortField = "created_at"
@@ -56,11 +56,11 @@ func (p *Pagination) GetSort() string {
 	return sortField + " " + direction
 }
 
-func (p *Pagination) SetRows(rows interface{}) {
+func (p *Pagination[T]) SetRows(rows []T) {
 	p.Rows = rows
 }
 
-func Paginate[T any](db *gorm.DB, repositoryNamespace string, model *T, pg *Pagination, filterFields []queryfilter.FilterField) TScopeDB {
+func Paginate[T any](db *gorm.DB, repositoryNamespace string, model *T, pg *Pagination[T], filterFields []queryfilter.FilterField) TScopeDB {
 	var total int64
 	if pg.Page < 1 {
 		pg.Page = 1
@@ -84,7 +84,7 @@ func Paginate[T any](db *gorm.DB, repositoryNamespace string, model *T, pg *Pagi
 	}
 }
 
-func (p *Pagination) GenerateListKey() (string, error) {
+func (p *Pagination[T]) GenerateListKey() (string, error) {
 	filterBytes, err := json.Marshal(p.FilterFields)
 	if err != nil {
 		return "", err
@@ -106,7 +106,7 @@ func (p *Pagination) GenerateListKey() (string, error) {
 	return crypto.CacheKey(string(keys)), nil
 }
 
-func (p *Pagination) GenerateCountKey() (string, error) {
+func (p *Pagination[T]) GenerateCountKey() (string, error) {
 	filterBytes, err := json.Marshal(p.FilterFields)
 	if err != nil {
 		return "", err
@@ -115,7 +115,7 @@ func (p *Pagination) GenerateCountKey() (string, error) {
 	return crypto.CacheKey(string(filterBytes)), nil
 }
 
-func (p *Pagination) GetListCacheKey() string {
+func (p *Pagination[T]) GetListCacheKey() string {
 	if p.ListCacheKey == "" {
 		key, err := p.GenerateListKey()
 		if err == nil {
@@ -126,7 +126,7 @@ func (p *Pagination) GetListCacheKey() string {
 	return p.ListCacheKey
 }
 
-func (p *Pagination) GetCountCacheKey() string {
+func (p *Pagination[T]) GetCountCacheKey() string {
 	if p.CountCacheKey == "" {
 		key, err := p.GenerateCountKey()
 		if err == nil {

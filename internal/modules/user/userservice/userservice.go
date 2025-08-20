@@ -20,7 +20,7 @@ type IUserService interface {
 	Update(db *gorm.DB, user *usermodel.User) error
 	GetByID(db *gorm.DB, id uint64) (*usermodel.User, error)
 	Delete(db *gorm.DB, id uint64) error
-	List(ctx *gin.Context, db *gorm.DB, pg *paginator.Pagination, filterFields []queryfilter.FilterField) error
+	List(ctx *gin.Context, db *gorm.DB, pg *paginator.Pagination[usermodel.User], filterFields []queryfilter.FilterField) error
 	ChangePassword(db *gorm.DB, data usermodel.ChangePassword) error
 }
 
@@ -107,7 +107,7 @@ func (s *UserService) Delete(db *gorm.DB, id uint64) error {
 	return s.repository.Delete(db, uint32(id))
 }
 
-func (s *UserService) List(ctx *gin.Context, db *gorm.DB, pg *paginator.Pagination, filterFields []queryfilter.FilterField) error {
+func (s *UserService) List(ctx *gin.Context, db *gorm.DB, pg *paginator.Pagination[usermodel.User], filterFields []queryfilter.FilterField) error {
 	return s.repository.List(ctx, db, pg, filterFields)
 }
 

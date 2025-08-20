@@ -2,14 +2,16 @@ package router
 
 import (
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+
+	"reapp/internal/modules/customer"
 	"reapp/internal/modules/user/authroute"
 	"reapp/internal/modules/user/roleroute"
 	"reapp/internal/modules/user/userroute"
 	"reapp/pkg/http/response"
 	"reapp/pkg/lang"
-
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 type Router struct {
@@ -25,6 +27,7 @@ func (r *Router) UseAdminRouter() *Router {
 	roleroute.UseRoleRoute()
 	userroute.UseUserRoute()
 	authroute.UseAuthRoute()
+	customer.UseCustomerRoute()
 	return r
 }
 

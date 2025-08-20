@@ -157,6 +157,7 @@ func (h *FileHandler) ServeFile(ctx *gin.Context) {
 	}
 
 	if (wStr != "" || hStr != "") && strings.HasPrefix(ct, "image/") {
+		fillFlag = fillFlag && wStr != "" && hStr != ""
 		ext := filepath.Ext(p)
 		name := strings.TrimSuffix(filepath.Base(p), ext)
 		fillSuffix := "0"

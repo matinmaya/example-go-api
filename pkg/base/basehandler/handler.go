@@ -16,9 +16,14 @@ import (
 	"reapp/pkg/queryfilter"
 )
 
-func Paginate[T any](ctx *gin.Context, service IServiceLister, query *T) {
+func Paginate[T any, TQ any](
+	ctx *gin.Context,
+	service IServiceLister[T],
+	query *TQ,
+	beforeResponse TListBeforeResponse[T],
+) {
 	db := dbctx.DB(ctx)
-	var pagination paginator.Pagination
+	var pagination paginator.Pagination[T]
 
 	if err := ctx.ShouldBindQuery(&query); err != nil {
 		log.Printf("%s", err.Error())
@@ -37,6 +42,13 @@ func Paginate[T any](ctx *gin.Context, service IServiceLister, query *T) {
 	if err := service.List(ctx, db, &pagination, filterFields); err != nil {
 		response.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
+	}
+
+	if beforeResponse != nil {
+		if err := beforeResponse(ctx, &pagination.Rows); err != nil {
+			response.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+			return
+		}
 	}
 
 	response.AsJSON(ctx, pagination, nil)
