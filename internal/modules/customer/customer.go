@@ -8,7 +8,7 @@ func InitModule() module.IHandler[Customer, uint32, Customer, CustomerListQuery]
 	hYields := module.HandlerYields[Customer, Customer]{
 		UpdateValidateScope: updateValidateScope(),
 		BeforeResponse:      beforeResponse(),
-		ListBeforeResponse:  listBeforeResponse(),
+		BeforeResponseList:  beforeResponseList(),
 	}
 	sYields := module.ServiceYields[Customer, uint32]{}
 	mod := module.NewModule[Customer, uint32, Customer, CustomerListQuery](

@@ -8,11 +8,11 @@ import (
 	"reapp/pkg/queryfilter"
 )
 
-type ServiceAdapter[T Identifiable[TID], TID UintID] struct {
+type ServiceAdapter[T IWithID[TID], TID IUintID] struct {
 	svc IService[T, TID]
 }
 
-func NewServiceAdapter[T Identifiable[TID], TID UintID](svc IService[T, TID]) ServiceAdapter[T, TID] {
+func NewServiceAdapter[T IWithID[TID], TID IUintID](svc IService[T, TID]) ServiceAdapter[T, TID] {
 	return ServiceAdapter[T, TID]{svc: svc}
 }
 

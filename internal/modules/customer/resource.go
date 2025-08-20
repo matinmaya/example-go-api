@@ -14,7 +14,7 @@ func updateValidateScope() func(*Customer, uint64) error {
 	}
 }
 
-func listBeforeResponse() func(*gin.Context, *[]Customer) error {
+func beforeResponseList() func(*gin.Context, *[]Customer) error {
 	return func(ctx *gin.Context, rows *[]Customer) error {
 		for i := range *rows {
 			if (*rows)[i].Img != "" {

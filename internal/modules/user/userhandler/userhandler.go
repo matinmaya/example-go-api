@@ -27,7 +27,7 @@ func NewUserHandler(s userservice.IUserService) *UserHandler {
 }
 
 func (h *UserHandler) List(ctx *gin.Context) {
-	basehandler.Paginate(ctx, h.service, &usermodel.UserListQuery{}, listBeforeResponse())
+	basehandler.Paginate(ctx, h.service, &usermodel.UserListQuery{}, beforeResponseList())
 }
 
 func (h *UserHandler) Create(ctx *gin.Context) {
@@ -76,7 +76,7 @@ func afterValidate(isUpdate bool) func(ctx *gin.Context, user *usermodel.User, f
 	}
 }
 
-func listBeforeResponse() func(*gin.Context, *[]usermodel.User) error {
+func beforeResponseList() func(*gin.Context, *[]usermodel.User) error {
 	return func(ctx *gin.Context, rows *[]usermodel.User) error {
 		for i := range *rows {
 			if (*rows)[i].Img != "" {

@@ -20,7 +20,7 @@ func Paginate[T any, TQ any](
 	ctx *gin.Context,
 	service IServiceLister[T],
 	query *TQ,
-	beforeResponse TListBeforeResponse[T],
+	beforeResponse TBeforeResponseList[T],
 ) {
 	db := dbctx.DB(ctx)
 	var pagination paginator.Pagination[T]

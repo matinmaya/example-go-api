@@ -8,15 +8,15 @@ import (
 	"reapp/pkg/queryfilter"
 )
 
-type UintID interface {
+type IUintID interface {
 	~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64
 }
 
-type Identifiable[TID UintID] interface {
+type IWithID[TID IUintID] interface {
 	GetID() TID
 }
 
-type IService[T Identifiable[TID], TID UintID] interface {
+type IService[T IWithID[TID], TID IUintID] interface {
 	Create(db *gorm.DB, model *T) error
 	GetByID(db *gorm.DB, id TID) (*T, error)
 	Update(db *gorm.DB, model *T) error
@@ -24,7 +24,7 @@ type IService[T Identifiable[TID], TID UintID] interface {
 	List(ctx *gin.Context, db *gorm.DB, pg *paginator.Pagination[T], filterFields []queryfilter.FilterField) error
 }
 
-type IServiceAdapter[T Identifiable[TID], TID UintID] interface {
+type IServiceAdapter[T IWithID[TID], TID IUintID] interface {
 	Create(db *gorm.DB, model *T) error
 	GetByID(db *gorm.DB, id uint64) (*T, error)
 	Update(db *gorm.DB, model *T) error
@@ -32,7 +32,7 @@ type IServiceAdapter[T Identifiable[TID], TID UintID] interface {
 	List(ctx *gin.Context, db *gorm.DB, pagination *paginator.Pagination[T], filterFields []queryfilter.FilterField) error
 }
 
-type IHandler[T Identifiable[TID], TID UintID, TDTO any, TQ any] interface {
+type IHandler[T IWithID[TID], TID IUintID, TDTO any, TQ any] interface {
 	Create(ctx *gin.Context)
 	Update(ctx *gin.Context)
 	Delete(ctx *gin.Context)

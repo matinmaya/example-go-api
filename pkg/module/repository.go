@@ -9,11 +9,11 @@ import (
 	"reapp/pkg/services/rediservice"
 )
 
-type Repository[T Identifiable[TID], TID UintID] struct {
+type Repository[T IWithID[TID], TID IUintID] struct {
 	namespace string
 }
 
-func NewRepository[T Identifiable[TID], TID UintID](namespace string) *Repository[T, TID] {
+func NewRepository[T IWithID[TID], TID IUintID](namespace string) *Repository[T, TID] {
 	return &Repository[T, TID]{namespace: namespace}
 }
 

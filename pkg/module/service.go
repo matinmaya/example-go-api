@@ -12,18 +12,18 @@ import (
 	"reapp/pkg/queryfilter"
 )
 
-type ServiceYields[T Identifiable[TID], TID UintID] struct {
+type ServiceYields[T IWithID[TID], TID IUintID] struct {
 	CreateBusinessLogic TBusinessLogic[T]
 	UpdateBusinessLogic TBusinessLogic[T]
 	DeleteBusinessLogic TBusinessLogic[T]
 }
 
-type Service[T Identifiable[TID], TID UintID] struct {
+type Service[T IWithID[TID], TID IUintID] struct {
 	repository *Repository[T, TID]
 	yields     ServiceYields[T, TID]
 }
 
-func NewService[T Identifiable[TID], TID UintID](
+func NewService[T IWithID[TID], TID IUintID](
 	repository *Repository[T, TID],
 	yields ServiceYields[T, TID],
 ) IService[T, TID] {
