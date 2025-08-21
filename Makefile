@@ -13,5 +13,5 @@ migrate:
 seed:
 	go run cmd/seeder/seeder.go
 
-ptg:
-	git add . && git commit -m "$(comment)" && git push
+push:
+	git add . && git commit -m "$(m)" && git push

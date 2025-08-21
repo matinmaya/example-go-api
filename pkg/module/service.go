@@ -13,9 +13,9 @@ import (
 )
 
 type ServiceYields[T IWithID[TID], TID IUintID] struct {
-	CreateBusinessLogic TBusinessLogic[T]
-	UpdateBusinessLogic TBusinessLogic[T]
-	DeleteBusinessLogic TBusinessLogic[T]
+	CreateUseCase TBusinessLogic[T]
+	UpdateUseCase TBusinessLogic[T]
+	DeleteUseCase TBusinessLogic[T]
 }
 
 type Service[T IWithID[TID], TID IUintID] struct {
@@ -38,8 +38,8 @@ func (s Service[T, TID]) Create(db *gorm.DB, model *T) error {
 		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
 	}
 
-	if s.yields.CreateBusinessLogic != nil {
-		if err := s.yields.CreateBusinessLogic(tx, model); err != nil {
+	if s.yields.CreateUseCase != nil {
+		if err := s.yields.CreateUseCase(tx, model); err != nil {
 			tx.Rollback()
 			log.Printf("%s", err.Error())
 			return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
@@ -71,8 +71,8 @@ func (s Service[T, TID]) Update(db *gorm.DB, model *T) error {
 		return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
 	}
 
-	if s.yields.UpdateBusinessLogic != nil {
-		if err := s.yields.UpdateBusinessLogic(tx, model); err != nil {
+	if s.yields.UpdateUseCase != nil {
+		if err := s.yields.UpdateUseCase(tx, model); err != nil {
 			tx.Rollback()
 			log.Printf("%s", err.Error())
 			return fmt.Errorf("%s", lang.TranByDB(tx, "response", "error"))
@@ -94,8 +94,8 @@ func (s Service[T, TID]) Delete(db *gorm.DB, id TID) error {
 		return fmt.Errorf("%s", lang.TranByDB(db, "response", "error"))
 	}
 
-	if s.yields.DeleteBusinessLogic != nil {
-		if err := s.yields.DeleteBusinessLogic(db, model); err != nil {
+	if s.yields.DeleteUseCase != nil {
+		if err := s.yields.DeleteUseCase(db, model); err != nil {
 			log.Printf("%s", err.Error())
 			return fmt.Errorf("%s", lang.TranByDB(db, "response", "error"))
 		}
