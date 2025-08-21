@@ -2,9 +2,10 @@ package response
 
 import (
 	"net/http"
-	"reapp/pkg/lang"
 
 	"github.com/gin-gonic/gin"
+
+	"reapp/pkg/lang"
 )
 
 type IResponse struct {
@@ -14,7 +15,7 @@ type IResponse struct {
 	Errors  map[string]string `json:"errors,omitempty"`
 }
 
-func Success(ctx *gin.Context, code int, message string, data interface{}) {
+func Success(ctx *gin.Context, code int, message string, data any) {
 	res := IResponse{
 		Code:    code,
 		Message: message,
@@ -37,7 +38,7 @@ func Error(ctx *gin.Context, code int, message string, err map[string]string) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-func AsJSON(ctx *gin.Context, data interface{}, err interface{}) {
+func JSON(ctx *gin.Context, data any, err any) {
 	if err != nil {
 		if errMap, ok := err.(map[string]string); ok {
 			Error(ctx, http.StatusInternalServerError, lang.ErrorMessage(ctx), errMap)

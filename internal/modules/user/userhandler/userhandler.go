@@ -57,7 +57,7 @@ func (h *UserHandler) ChangePassword(ctx *gin.Context) {
 	}
 
 	err := h.service.ChangePassword(db, data)
-	response.AsJSON(ctx, nil, err)
+	response.JSON(ctx, nil, err)
 }
 
 func afterValidate(isUpdate bool) func(ctx *gin.Context, user *usermodel.User, fields *[]string) error {

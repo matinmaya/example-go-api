@@ -51,7 +51,7 @@ func Paginate[T any, TQ any](
 		}
 	}
 
-	response.AsJSON(ctx, pagination, nil)
+	response.JSON(ctx, pagination, nil)
 }
 
 func GetAll[T any](ctx *gin.Context, service IServiceGetter[T]) {
@@ -63,7 +63,7 @@ func GetAll[T any](ctx *gin.Context, service IServiceGetter[T]) {
 		return
 	}
 
-	response.AsJSON(ctx, data, nil)
+	response.JSON(ctx, data, nil)
 }
 
 func GetDetail[T any](ctx *gin.Context, service IServiceGetterDetail[T]) {

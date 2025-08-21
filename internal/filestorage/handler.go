@@ -33,17 +33,17 @@ func NewFileHandler(svc *Service) *FileHandler { return &FileHandler{svc: svc} }
 func (h *FileHandler) Upload(ctx *gin.Context) {
 	f, err := ctx.FormFile("file")
 	if err != nil {
-		response.AsJSON(ctx, nil, errors.New("file is required"))
+		response.JSON(ctx, nil, errors.New("file is required"))
 		return
 	}
 
 	keyOrURL, err := h.svc.SaveUpload(ctx.Request.Context(), "/files/", f)
 	if err != nil {
-		response.AsJSON(ctx, nil, err)
+		response.JSON(ctx, nil, err)
 		return
 	}
 
-	response.AsJSON(ctx, gin.H{
+	response.JSON(ctx, gin.H{
 		"path":      keyOrURL,
 		"full_path": ctx.Request.Host + "/" + filesystem.TrimPath(filesystem.PrefixRoutePath()) + keyOrURL,
 	}, nil)
@@ -52,7 +52,7 @@ func (h *FileHandler) Upload(ctx *gin.Context) {
 func (h *FileHandler) UploadImage(ctx *gin.Context) {
 	f, err := ctx.FormFile("image")
 	if err != nil {
-		response.AsJSON(ctx, nil, errors.New("image is required"))
+		response.JSON(ctx, nil, errors.New("image is required"))
 		return
 	}
 
@@ -65,13 +65,13 @@ func (h *FileHandler) UploadImage(ctx *gin.Context) {
 	}
 	ext := strings.ToLower(path.Ext(f.Filename))
 	if !allowedExts[ext] {
-		response.AsJSON(ctx, nil, errors.New("unsupported image format"))
+		response.JSON(ctx, nil, errors.New("unsupported image format"))
 		return
 	}
 
 	file, err := f.Open()
 	if err != nil {
-		response.AsJSON(ctx, nil, errors.New("failed to open image"))
+		response.JSON(ctx, nil, errors.New("failed to open image"))
 		return
 	}
 	defer file.Close()
@@ -79,12 +79,12 @@ func (h *FileHandler) UploadImage(ctx *gin.Context) {
 	buffer := make([]byte, 512)
 	_, err = file.Read(buffer)
 	if err != nil {
-		response.AsJSON(ctx, nil, errors.New("failed to read image"))
+		response.JSON(ctx, nil, errors.New("failed to read image"))
 		return
 	}
 	contentType := http.DetectContentType(buffer)
 	if !strings.HasPrefix(contentType, "image/") {
-		response.AsJSON(ctx, nil, errors.New("file is not an image"))
+		response.JSON(ctx, nil, errors.New("file is not an image"))
 		return
 	}
 
@@ -92,7 +92,7 @@ func (h *FileHandler) UploadImage(ctx *gin.Context) {
 	file.Close()
 	file, err = f.Open()
 	if err != nil {
-		response.AsJSON(ctx, nil, errors.New("failed to reopen image"))
+		response.JSON(ctx, nil, errors.New("failed to reopen image"))
 		return
 	}
 	defer file.Close()
@@ -101,11 +101,11 @@ func (h *FileHandler) UploadImage(ctx *gin.Context) {
 
 	keyOrURL, err := h.svc.SaveImageUpload(ctx.Request.Context(), "/images/", f, webpFlag)
 	if err != nil {
-		response.AsJSON(ctx, nil, err)
+		response.JSON(ctx, nil, err)
 		return
 	}
 
-	response.AsJSON(ctx, gin.H{
+	response.JSON(ctx, gin.H{
 		"path":      keyOrURL,
 		"full_path": ctx.Request.Host + "/" + filesystem.TrimPath(filesystem.PrefixRoutePath()) + keyOrURL,
 	}, nil)
@@ -234,8 +234,8 @@ func (h *FileHandler) Delete(ctx *gin.Context) {
 	p := ctx.Param("path")
 	p = strings.TrimPrefix(p, "/")
 	if err := h.svc.Delete(ctx.Request.Context(), p); err != nil {
-		response.AsJSON(ctx, nil, err)
+		response.JSON(ctx, nil, err)
 		return
 	}
-	response.AsJSON(ctx, gin.H{"deleted": path.Base(p)}, nil)
+	response.JSON(ctx, gin.H{"deleted": path.Base(p)}, nil)
 }
