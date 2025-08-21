@@ -1,4 +1,4 @@
-package storagecache
+package cleaner
 
 import (
 	"fmt"
