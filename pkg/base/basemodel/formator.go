@@ -69,3 +69,28 @@ func (t *TString) UnmarshalParam(param string) error {
 	*t = TString(strings.TrimSpace(param))
 	return nil
 }
+
+// Value implements the driver.Valuer interface
+// It converts empty strings into NULL before saving to DB
+func (t TString) Value() (driver.Value, error) {
+	s := strings.TrimSpace(string(t))
+	if s == "" {
+		return nil, nil // store NULL
+	}
+	return s, nil
+}
+
+// Scan implements the sql.Scanner interface
+// It reads NULL values from DB back into TString
+func (t *TString) Scan(value interface{}) error {
+	if value == nil {
+		*t = ""
+		return nil
+	}
+	if b, ok := value.([]byte); ok {
+		*t = TString(string(b))
+		return nil
+	}
+	*t = TString(value.(string))
+	return nil
+}

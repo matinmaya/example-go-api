@@ -21,9 +21,23 @@ func Unique(fl validator.FieldLevel) bool {
 		return false
 	}
 
-	tableName := params[0]
-	// uniqueFields := make(map[string]interface{})
+	if len(params) > 1 {
+		isNullable := false
+		uniqueParams := strings.Split(params[1], "&")
+		if len(uniqueParams) > 0 {
+			for _, param := range uniqueParams {
+				if param == "nullable" {
+					isNullable = true
+					break
+				}
+			}
+			if isNullable && fieldValue == "" {
+				return true
+			}
+		}
+	}
 
+	tableName := params[0]
 	structFieldName := fl.StructFieldName()
 
 	field, ok := reflect.TypeOf(fl.Parent().Interface()).FieldByName(structFieldName)

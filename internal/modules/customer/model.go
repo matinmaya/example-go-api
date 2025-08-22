@@ -7,10 +7,15 @@ import (
 
 type Customer struct {
 	basemodel.PrimaryKey
-	CardNumber basemodel.TString `json:"card_number" gorm:"unique;not null;type:varchar(16);" validate:"required,min=6,max=50,unique=cus_customers?id"`
-	Fullname   basemodel.TString `json:"fullname" gorm:"not null;type:varchar(50);" validate:"required,min=6,max=50,unique=cus_customers?id"`
-	Status     bool              `json:"status" gorm:"not null;default=false;"`
-	Img        string            `json:"img" gorm:"type:varchar(255);"`
+	Fullname       basemodel.TString `json:"fullname" gorm:"not null;type:varchar(50);" validate:"required,min=6,max=50,unique=cus_customers?id"`
+	IdentifyNumber basemodel.TString `json:"identify_number" gorm:"type:varchar(16);uniqueIndex;default:null" validate:"max=16,unique=cus_customers?id&nullable"`
+	PassportNumber basemodel.TString `json:"passport_number" gorm:"type:varchar(16);uniqueIndex;default:null" validate:"max=16,unique=cus_customers?id&nullable"`
+	Phone          basemodel.TString `json:"phone" gorm:"type:varchar(20);uniqueIndex;default:null" validate:"max=20,unique=cus_customers?id&nullable"`
+	Email          basemodel.TString `json:"email" gorm:"type:varchar(50);uniqueIndex;default:null" validate:"max=50,unique=cus_customers?id&nullable"`
+	Address        basemodel.TString `json:"address" gorm:"type:varchar(255);"`
+	Img            string            `json:"img" gorm:"type:varchar(255);"`
+	Note           string            `json:"note" gorm:"type:text;"`
+	Status         bool              `json:"status" gorm:"not null;default=false;"`
 	basemodel.SoftFields
 	validators.ValidateUniqueScope
 }
@@ -24,6 +29,7 @@ func (c Customer) GetID() uint32 {
 }
 
 type CustomerListQuery struct {
-	Fullname basemodel.TString `form:"fullname" filter:"like"`
-	Status   bool              `form:"status" filter:"equal"`
+	Fullname       basemodel.TString `form:"fullname" filter:"like"`
+	IdentifyNumber basemodel.TString `form:"identify_number" filter:"equal"`
+	Status         bool              `form:"status" filter:"equal"`
 }
