@@ -63,5 +63,7 @@ var EN = map[string]map[string]string{
 		"path":                 "Path does not exist",
 		"boolean":              "Value must be a boolean (true or false)",
 		"slug_strict":          "Value can only contain letters, numbers, and underscores, and cannot start or end with an underscore",
+		"date":                 "Invalid date format (YYYY-MM-DD)",
+		"oneof":                "Value must be one of the following:",
 	},
 }

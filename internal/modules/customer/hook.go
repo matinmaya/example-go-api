@@ -3,18 +3,19 @@ package customer
 import (
 	"github.com/gin-gonic/gin"
 
+	"reapp/pkg/base/basehandler"
 	"reapp/pkg/filesystem"
 	"reapp/pkg/validators"
 )
 
-func updateValidateScope() func(*Customer, uint64) error {
+func updateValidateScope() basehandler.TWithIDScope[Customer] {
 	return func(cus *Customer, id uint64) error {
 		cus.UniqueScope = validators.ExceptByID(id)
 		return nil
 	}
 }
 
-func beforeResponseList() func(*gin.Context, *[]Customer) error {
+func beforeResponseList() basehandler.TResponseListHook[Customer] {
 	return func(ctx *gin.Context, rows *[]Customer) error {
 		for i := range *rows {
 			if (*rows)[i].Img != "" {
@@ -25,7 +26,7 @@ func beforeResponseList() func(*gin.Context, *[]Customer) error {
 	}
 }
 
-func beforeResponse() func(*gin.Context, *Customer) error {
+func beforeResponse() basehandler.TResponseHook[Customer] {
 	return func(ctx *gin.Context, cus *Customer) error {
 		if cus.Img != "" {
 			cus.Img = filesystem.FullImageURL(ctx, cus.Img)

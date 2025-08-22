@@ -48,7 +48,7 @@ func (h *RoleHandler) Delete(ctx *gin.Context) {
 	})
 }
 
-func beforeResponse(isUpdate bool) func(ctx *gin.Context, role *rolemodel.Role) error {
+func beforeResponse(isUpdate bool) basehandler.TResponseHook[rolemodel.Role] {
 	return func(ctx *gin.Context, role *rolemodel.Role) error {
 		role.PermissionIds = []uint32{}
 		if isUpdate {

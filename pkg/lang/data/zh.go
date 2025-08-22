@@ -62,5 +62,7 @@ var ZH = map[string]map[string]string{
 		"path":                 "路径不存在",
 		"boolean":              "值必须是布尔类型（true 或 false）",
 		"slug_strict":          "值只能包含字母、数字和下划线，且不能以下划线开头或结尾",
+		"date":                 "日期格式无效（YYYY-MM-DD）",
+		"oneof":                "值必须是以下之一：",
 	},
 }

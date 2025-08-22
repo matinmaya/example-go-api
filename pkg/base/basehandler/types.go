@@ -3,7 +3,7 @@ package basehandler
 import "github.com/gin-gonic/gin"
 
 type TScope[T any] func(*T) error
-type TScopeWithID[T any] func(*T, uint64) error
+type TWithIDScope[T any] func(*T, uint64) error
 type TAfterValidate[T any] func(ctx *gin.Context, modelDTO *T, fields *[]string) error
-type TBeforeResponse[T any] func(ctx *gin.Context, model *T) error
-type TBeforeResponseList[T any] func(ctx *gin.Context, models *[]T) error
+type TResponseHook[T any] func(ctx *gin.Context, model *T) error
+type TResponseListHook[T any] func(ctx *gin.Context, rows *[]T) error

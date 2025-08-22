@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator"
+	"github.com/go-playground/validator/v10"
 
 	"reapp/pkg/lang"
 )
@@ -33,6 +33,10 @@ func Message(ctx *gin.Context, fe validator.FieldError) string {
 		return lang.Tran(ctx, "validation", "path")
 	case "slug_strict":
 		return lang.Tran(ctx, "validation", "slug_strict")
+	case "date":
+		return lang.Tran(ctx, "validation", "date")
+	case "oneof":
+		return lang.TranWithParams(ctx, "validation", "oneof", fe.Param())
 	default:
 		return fmt.Sprintf("Validation failed on field '%s' with tag '%s'", fe.Field(), fe.Tag())
 	}

@@ -60,7 +60,7 @@ func (h *UserHandler) ChangePassword(ctx *gin.Context) {
 	response.JSON(ctx, nil, err)
 }
 
-func afterValidate(isUpdate bool) func(ctx *gin.Context, user *usermodel.User, fields *[]string) error {
+func afterValidate(isUpdate bool) basehandler.TAfterValidate[usermodel.User] {
 	return func(ctx *gin.Context, user *usermodel.User, fields *[]string) error {
 		if isUpdate {
 			reqctx.RemoveFields(fields, "Password")
@@ -76,7 +76,7 @@ func afterValidate(isUpdate bool) func(ctx *gin.Context, user *usermodel.User, f
 	}
 }
 
-func beforeResponseList() func(*gin.Context, *[]usermodel.User) error {
+func beforeResponseList() basehandler.TResponseListHook[usermodel.User] {
 	return func(ctx *gin.Context, rows *[]usermodel.User) error {
 		for i := range *rows {
 			if (*rows)[i].Img != "" {
@@ -87,7 +87,7 @@ func beforeResponseList() func(*gin.Context, *[]usermodel.User) error {
 	}
 }
 
-func beforeResponse(isUpdate bool) func(ctx *gin.Context, user *usermodel.User) error {
+func beforeResponse(isUpdate bool) basehandler.TResponseHook[usermodel.User] {
 	return func(ctx *gin.Context, user *usermodel.User) error {
 		user.RoleIds = []uint16{}
 		if user.Img != "" {

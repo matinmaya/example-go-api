@@ -8,10 +8,10 @@ import (
 
 type HandlerYields[T any, TDTO any] struct {
 	CreateValidateScope basehandler.TScope[TDTO]
-	UpdateValidateScope basehandler.TScopeWithID[TDTO]
+	UpdateValidateScope basehandler.TWithIDScope[TDTO]
 	AfterValidate       basehandler.TAfterValidate[TDTO]
-	BeforeResponse      basehandler.TBeforeResponse[T]
-	BeforeResponseList  basehandler.TBeforeResponseList[T]
+	BeforeResponse      basehandler.TResponseHook[T]
+	BeforeResponseList  basehandler.TResponseListHook[T]
 }
 
 type Handler[T IWithID[TID], TID IUintID, TDTO any, TQ any] struct {

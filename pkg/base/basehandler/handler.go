@@ -20,7 +20,7 @@ func Paginate[T any, TQ any](
 	ctx *gin.Context,
 	service IServiceLister[T],
 	query *TQ,
-	beforeResponse TBeforeResponseList[T],
+	beforeResponse TResponseListHook[T],
 ) {
 	db := dbctx.DB(ctx)
 	var pagination paginator.Pagination[T]
@@ -89,7 +89,7 @@ func Create[T1 any, T2 any](
 	modelDTO *T2,
 	setValidationScope TScope[T2],
 	afterValidate TAfterValidate[T2],
-	beforeResponse TBeforeResponse[T1],
+	beforeResponse TResponseHook[T1],
 ) {
 	db := dbctx.DB(ctx)
 	fields, bad := reqctx.GetFieldNames(ctx)
@@ -141,9 +141,9 @@ func Update[T1 any, T2 any](
 	ctx *gin.Context,
 	service IServiceUpdater[T1],
 	modelDTO *T2,
-	setValidationScope TScopeWithID[T2],
+	setValidationScope TWithIDScope[T2],
 	afterValidate TAfterValidate[T2],
-	beforeResponse TBeforeResponse[T1],
+	beforeResponse TResponseHook[T1],
 ) {
 	db := dbctx.DB(ctx)
 	var id uint64
