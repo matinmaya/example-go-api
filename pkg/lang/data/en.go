@@ -65,5 +65,6 @@ var EN = map[string]map[string]string{
 		"slug_strict":          "Value can only contain letters, numbers, and underscores, and cannot start or end with an underscore",
 		"date":                 "Invalid date format (YYYY-MM-DD)",
 		"oneof":                "Value must be one of the following:",
+		"invalid_format":       "Invalid format",
 	},
 }

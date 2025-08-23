@@ -4,15 +4,16 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-	"reapp/pkg/http/response"
-	"reapp/pkg/lang"
-	"reapp/pkg/validators"
 	"reflect"
 	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+
+	"reapp/pkg/http/response"
+	"reapp/pkg/lang"
+	"reapp/pkg/validators"
 )
 
 type IRequestDTO interface{}
@@ -54,6 +55,14 @@ func Validate(ctx *gin.Context, dto IRequestDTO) bool {
 			fieldName := unmarshalTypeErr.Field
 			response.Error(ctx, http.StatusBadRequest, lang.Tran(ctx, "validation", "failed"), map[string]string{
 				fieldName: lang.Tran(ctx, "validation", "boolean"),
+			})
+			return false
+		}
+
+		fieldName := unmarshalTypeErr.Field
+		if fieldName != "" {
+			response.Error(ctx, http.StatusBadRequest, lang.Tran(ctx, "validation", "failed"), map[string]string{
+				fieldName: lang.Tran(ctx, "validation", "invalid_format"),
 			})
 			return false
 		}

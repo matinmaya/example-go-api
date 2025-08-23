@@ -64,5 +64,6 @@ var ZH = map[string]map[string]string{
 		"slug_strict":          "值只能包含字母、数字和下划线，且不能以下划线开头或结尾",
 		"date":                 "日期格式无效（YYYY-MM-DD）",
 		"oneof":                "值必须是以下之一：",
+		"invalid_format":       "格式无效",
 	},
 }
