@@ -14,6 +14,7 @@ type IUintID interface {
 
 type IWithID[TID IUintID] interface {
 	GetID() TID
+	IsCreated() bool
 }
 
 type IService[T IWithID[TID], TID IUintID] interface {

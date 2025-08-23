@@ -11,6 +11,10 @@ import (
 	"reapp/pkg/context/authctx"
 )
 
+func (s SoftFields) IsCreated() bool {
+	return !s.CreatedAt.IsZero()
+}
+
 func (s *SoftFields) BeforeCreate(tx *gorm.DB) error {
 
 	if uid := GetUserID(tx); uid != nil {
@@ -48,9 +52,12 @@ func (s *SoftFields) BeforeUpdate(tx *gorm.DB) error {
 		return fmt.Errorf("could not determine primary key for model")
 	}
 
-	if err := tx.Session(&gorm.Session{}).Model(tx.Statement.Dest).Where(fmt.Sprintf("%s = ?", pkf), pkv).First(model).Error; err != nil {
+	if err := tx.First(&model, pkv).Error; err != nil {
 		return fmt.Errorf("fetching original model before update: %w", err)
 	}
+	// if err := tx.Session(&gorm.Session{}).Model(tx.Statement.Dest).Where(fmt.Sprintf("%s = ?", pkf), pkv).First(model).Error; err != nil {
+	// 	return fmt.Errorf("fetching original model before update: %w", err)
+	// }
 
 	if err := SetOldValue(tx, model); err != nil {
 		return fmt.Errorf("setting model value: %w", err)
@@ -92,7 +99,7 @@ func (s *SoftFields) AfterUpdate(tx *gorm.DB) (err error) {
 		}
 
 		if !reflect.DeepEqual(current, oldValue) {
-			changes[ToColumnName(name)] = map[string]interface{}{
+			changes[ToColumn(name)] = map[string]interface{}{
 				"from": oldValue,
 				"to":   current,
 			}
@@ -180,7 +187,7 @@ func AddLogData(tx *gorm.DB, tbName, tbIDStr, action string, changes any, fullMo
 	return tx.Session(&gorm.Session{NewDB: true}).Create(&log).Error
 }
 
-func ToColumnName(fieldname string) string {
+func ToColumn(fieldname string) string {
 
 	var result []rune
 	for i, r := range fieldname {

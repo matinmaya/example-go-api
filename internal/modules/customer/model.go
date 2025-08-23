@@ -7,7 +7,7 @@ import (
 
 type Customer struct {
 	basemodel.PrimaryKey
-	Fullname       basemodel.TString   `json:"fullname" gorm:"not null;type:varchar(50);" validate:"required,min=6,max=50,unique=cus_customers"`
+	Fullname       basemodel.TString   `json:"fullname" gorm:"not null;type:varchar(50);" validate:"required,min=6,max=50"`
 	IdentifyNumber basemodel.TString   `json:"identify_number" gorm:"type:varchar(16);uniqueIndex;default:null" validate:"max=16,unique=cus_customers?nullable"`
 	PassportNumber basemodel.TString   `json:"passport_number" gorm:"type:varchar(16);uniqueIndex;default:null" validate:"max=16,unique=cus_customers?nullable"`
 	Phone          basemodel.TString   `json:"phone" gorm:"type:varchar(20);uniqueIndex;default:null" validate:"max=20,unique=cus_customers?nullable"`

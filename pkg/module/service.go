@@ -59,9 +59,11 @@ func (s Service[T, TID]) GetByID(db *gorm.DB, id TID) (*T, error) {
 }
 
 func (s Service[T, TID]) Update(db *gorm.DB, model *T) error {
-	if _, err := s.repository.GetByID(db, (*model).GetID()); err != nil {
-		log.Printf("%s", err.Error())
-		return fmt.Errorf("%s", lang.TranByDB(db, "response", "error"))
+	if !s.repository.IsModelFetched(*model) {
+		if _, err := s.repository.GetByID(db, (*model).GetID()); err != nil {
+			log.Printf("%s", err.Error())
+			return fmt.Errorf("%s", lang.TranByDB(db, "response", "error"))
+		}
 	}
 
 	tx := db.Begin()

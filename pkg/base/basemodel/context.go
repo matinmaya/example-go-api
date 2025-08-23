@@ -11,7 +11,7 @@ type ctxKey string
 
 const oldValueKey ctxKey = "oldValue"
 
-func SetOldValue(db *gorm.DB, instance any) error {
+func SetOldValue(tx *gorm.DB, instance any) error {
 	data := make(map[string]interface{})
 
 	val := reflect.ValueOf(instance)
@@ -19,13 +19,13 @@ func SetOldValue(db *gorm.DB, instance any) error {
 		val = val.Elem()
 	}
 
-	for _, field := range db.Statement.Schema.Fields {
-		fieldVal, _ := field.ValueOf(db.Statement.Context, val)
+	for _, field := range tx.Statement.Schema.Fields {
+		fieldVal, _ := field.ValueOf(tx.Statement.Context, val)
 		data[field.Name] = fieldVal
 	}
 
-	ctx := context.WithValue(db.Statement.Context, oldValueKey, data)
-	db.Statement.Context = ctx
+	ctx := context.WithValue(tx.Statement.Context, oldValueKey, data)
+	tx.Statement.Context = ctx
 	return nil
 }
 

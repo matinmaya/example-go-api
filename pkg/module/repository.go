@@ -67,3 +67,7 @@ func (r *Repository[T, TID]) SetNamespace(name string) {
 		r.namespace = name
 	}
 }
+
+func (r *Repository[T, TID]) IsModelFetched(model T) bool {
+	return model.IsCreated() && model.GetID() != 0
+}
