@@ -99,7 +99,7 @@ func Create[T1 any, T2 any](
 	}
 
 	if setValidationScope != nil {
-		if err := setValidationScope(modelDTO); err != nil {
+		if err := setValidationScope(ctx, modelDTO); err != nil {
 			response.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
@@ -164,7 +164,7 @@ func Update[T1 any, T2 any](
 	}
 
 	if setValidationScope != nil {
-		if err := setValidationScope(modelDTO, id); err != nil {
+		if err := setValidationScope(ctx, modelDTO, id); err != nil {
 			response.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}

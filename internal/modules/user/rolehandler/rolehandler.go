@@ -35,7 +35,7 @@ func (h *RoleHandler) Create(ctx *gin.Context) {
 }
 
 func (h *RoleHandler) Update(ctx *gin.Context) {
-	basehandler.Update(ctx, h.service, &rolemodel.Role{}, func(role *rolemodel.Role, id uint64) error {
+	basehandler.Update(ctx, h.service, &rolemodel.Role{}, func(ctx *gin.Context, role *rolemodel.Role, id uint64) error {
 		role.UniqueScope = validators.ExceptByID(id)
 		return nil
 	}, nil, beforeResponse(true))

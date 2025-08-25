@@ -8,8 +8,8 @@ import (
 
 type User struct {
 	basemodel.PrimaryKey
-	Username basemodel.TString `json:"username" gorm:"unique;not null;type:varchar(50);" validate:"required,min=6,max=50,slug_strict,unique=sys_users?id"`
-	Password string            `json:"-" gorm:"not null;type:varchar(120);"`
+	Username basemodel.TString `json:"username" gorm:"<-:create;unique;not null;type:varchar(50);" validate:"required,min=6,max=50,slug_strict,unique=sys_users?id"`
+	Password string            `json:"-" gorm:"<-:create;not null;type:varchar(120);"`
 	Status   bool              `json:"status" gorm:"not null;default=false;"`
 	Img      string            `json:"img" gorm:"type:varchar(255);"`
 	Roles    []rolemodel.Role  `json:"roles,omitempty" gorm:"many2many:sys_user_role;"`

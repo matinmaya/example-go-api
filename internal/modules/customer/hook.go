@@ -9,7 +9,7 @@ import (
 )
 
 func updateValidateScope() basehandler.TWithIDScope[Customer] {
-	return func(cus *Customer, id uint64) error {
+	return func(ctx *gin.Context, cus *Customer, id uint64) error {
 		cus.UniqueScope = validators.ExceptByID(id)
 		return nil
 	}

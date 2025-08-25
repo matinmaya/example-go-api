@@ -35,7 +35,7 @@ func (h *UserHandler) Create(ctx *gin.Context) {
 }
 
 func (h *UserHandler) Update(ctx *gin.Context) {
-	basehandler.Update(ctx, h.service, &usermodel.User{}, func(user *usermodel.User, id uint64) error {
+	basehandler.Update(ctx, h.service, &usermodel.User{}, func(ctx *gin.Context, user *usermodel.User, id uint64) error {
 		user.UniqueScope = validators.ExceptByID(id)
 		return nil
 	}, afterValidate(true), beforeResponse(true))

@@ -33,7 +33,7 @@ func NewUserService(r *userrepository.UserRepository) IUserService {
 }
 
 func (s *UserService) Create(db *gorm.DB, user *usermodel.User) error {
-	password, err := crypto.Make(user.Password)
+	password, err := crypto.Make("123456")
 	if err != nil {
 		log.Printf("%s", err.Error())
 		return fmt.Errorf("%s", lang.TranByDB(db, "auth", "failed_has_password"))
